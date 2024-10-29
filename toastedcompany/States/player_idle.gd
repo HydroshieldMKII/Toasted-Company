@@ -21,4 +21,4 @@ func update(delta: float) -> void:
 func physics_update(delta: float) -> void:
 	if not anim_player : return
 		
-	#anim_player.play("idle_front")
+	anim_player.play("idle")

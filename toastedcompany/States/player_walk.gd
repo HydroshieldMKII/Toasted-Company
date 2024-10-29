@@ -22,6 +22,7 @@ func update(delta : float) -> void:
 		player.velocity = player.velocity.move_toward(Vector2.ZERO, 10)
 	
 	if (player.velocity.length() == 0) :
+		print("Transitionned to idle")
 		Transitioned.emit(self, "idle")
 	
 	player.direction = dir
@@ -32,10 +33,14 @@ func physics_update(delta: float) -> void:
 		if (player.velocity.x > 0 or player.velocity.x < 0) :
 			anim_player.play("walk_side")
 			if (player.velocity.x > 0) :
+				print("walking right")
 				player.sprite.flip_h = false
 			elif (player.velocity.x < 0) :
+				print("walking left")
 				player.sprite.flip_h = true
 		elif (player.velocity.y < 0) :
-			anim_player.play("walk_back")
+			print("Walk Up")
+			anim_player.play("walk_up")
 		elif (player.velocity.y > 0) :
-			anim_player.play("walk_front")
+			print("walk down")
+			anim_player.play("walk_down")

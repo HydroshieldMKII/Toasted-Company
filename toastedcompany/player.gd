@@ -3,8 +3,8 @@ class_name Player
 
 func _ready() -> void:
 	anim_player = $AnimationPlayer
-	sprite = $Sprite2D
-	anim_player.play("idle_front")
+	sprite = $Sprite
+	anim_player.play("idle")
 
 
 func _physics_process(delta: float) -> void:
