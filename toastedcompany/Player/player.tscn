@@ -1,12 +1,27 @@
 [gd_scene load_steps=13 format=3 uid="uid://dwpl0ucshohks"]
 
-[ext_resource type="Script" path="res://player.gd" id="1_kww0b"]
+[ext_resource type="Script" path="res://Player/player.gd" id="1_kww0b"]
 [ext_resource type="Texture2D" uid="uid://dx8i2cmb7bsqv" path="res://Assests/Character.png" id="2_q7jl4"]
-[ext_resource type="Script" path="res://state_machine.gd" id="3_6r6ed"]
-[ext_resource type="Script" path="res://States/player_walk.gd" id="4_j5ccd"]
-[ext_resource type="Script" path="res://States/player_idle.gd" id="5_371nc"]
+[ext_resource type="Script" path="res://StateMachine/state_machine.gd" id="3_6r6ed"]
+[ext_resource type="Script" path="res://StateMachine/player_walk.gd" id="4_j5ccd"]
+[ext_resource type="Script" path="res://StateMachine/player_idle.gd" id="5_371nc"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_n75g3"]
+
+[sub_resource type="Animation" id="Animation_1xl30"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
 
 [sub_resource type="Animation" id="Animation_7vqml"]
 resource_name = "idle"
@@ -24,21 +39,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [0, 1]
-}
-
-[sub_resource type="Animation" id="Animation_1xl30"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [1]
 }
 
 [sub_resource type="Animation" id="Animation_ld3dn"]
