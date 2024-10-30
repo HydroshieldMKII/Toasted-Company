@@ -1,22 +1,33 @@
-extends Node2D
+extends TileMapLayer
 
-@export var level_size := Vector2(400, 200)
-@export var rooms_size := Vector2(50, 70)
+
+@export var level_size := Vector2(100, 80)
+@export var rooms_size := Vector2(10, 14)
 @export var rooms_max := 15
-@export var room_color := Color(0.3, 0.6, 1.0)  # Color for rooms
-@export var corridor_color := Color(0.9, 0.9, 0.9)  # Color for corridors
 
-var level_data = {}  # Store all positions to draw
+@onready var level: TileMapLayer = $Level
+@onready var camera: Camera2D = $Camera2D
+
 
 func _ready() -> void:
+	_setup_camera()
 	_generate()
-	_draw()  # Triggers the _draw function
+
+
+func _setup_camera() -> void:
+	pass
+	#camera.position = level.map_to_world(level_size / 2)
+	#var z := max(level_size.x, level_size.y) / 8
+	#camera.zoom = Vector2(z, z)
+
 
 func _generate() -> void:
-	level_data.clear()
-	level_data = _generate_data()
+	level.clear()
+	for vector in _generate_data():
+		level.set_cellv(vector, 0)
 
-func _generate_data() -> Dictionary:
+
+func _generate_data() -> Array:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 
@@ -31,7 +42,8 @@ func _generate_data() -> Dictionary:
 		if rooms.size() > 1:
 			var room_previous: Rect2 = rooms[-2]
 			_add_connection(rng, data, room_previous, room)
-	return data
+	return data.keys()
+
 
 func _get_random_room(rng: RandomNumberGenerator) -> Rect2:
 	var width := rng.randi_range(rooms_size.x, rooms_size.y)
@@ -40,11 +52,13 @@ func _get_random_room(rng: RandomNumberGenerator) -> Rect2:
 	var y := rng.randi_range(0, level_size.y - height - 1)
 	return Rect2(x, y, width, height)
 
+
 func _add_room(data: Dictionary, rooms: Array, room: Rect2) -> void:
 	rooms.push_back(room)
 	for x in range(room.position.x, room.end.x):
 		for y in range(room.position.y, room.end.y):
-			data[Vector2(x, y)] = room_color  # Add room tiles to data with color
+			data[Vector2(x, y)] = null
+
 
 func _add_connection(rng: RandomNumberGenerator, data: Dictionary, room1: Rect2, room2: Rect2) -> void:
 	var room_center1 := (room1.position + room1.end) / 2
@@ -56,13 +70,15 @@ func _add_connection(rng: RandomNumberGenerator, data: Dictionary, room1: Rect2,
 		_add_corridor(data, room_center1.y, room_center2.y, room_center1.x, Vector2.AXIS_Y)
 		_add_corridor(data, room_center1.x, room_center2.x, room_center2.y, Vector2.AXIS_X)
 
+
 func _add_corridor(data: Dictionary, start: int, end: int, constant: int, axis: int) -> void:
 	for t in range(min(start, end), max(start, end) + 1):
 		var point := Vector2.ZERO
 		match axis:
 			Vector2.AXIS_X: point = Vector2(t, constant)
 			Vector2.AXIS_Y: point = Vector2(constant, t)
-		data[point] = corridor_color  # Add corridor tiles to data with color
+		data[point] = null
+
 
 func _intersects(rooms: Array, room: Rect2) -> bool:
 	var out := false
@@ -71,10 +87,3 @@ func _intersects(rooms: Array, room: Rect2) -> bool:
 			out = true
 			break
 	return out
-
-# Drawing function to render rooms and corridors as colored shapes
-func _draw() -> void:
-	var tile_size = Vector2(16, 16)  # Adjust the size of each "tile"
-	for position in level_data.keys():
-		var color = level_data[position]
-		draw_rect(Rect2(position * tile_size, tile_size), color)
