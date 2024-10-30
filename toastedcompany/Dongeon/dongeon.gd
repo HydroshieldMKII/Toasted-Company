@@ -1,80 +1,123 @@
 extends Node2D
 
-@export var level_size := Vector2(400, 200)
-@export var rooms_size := Vector2(50, 70)
+@export var level_size := Vector2(1000, 750)
+@export var rooms_size := Vector2(100, 140)
 @export var rooms_max := 15
-@export var room_color := Color(0.3, 0.6, 1.0)  # Color for rooms
-@export var corridor_color := Color(0.9, 0.9, 0.9)  # Color for corridors
+@export var room_color := Color(0.3, 0.6, 1.0)
+@export var corridor_color := Color(0.9, 0.9, 0.9)
+@export var corridor_width := 12
+@export var player_scene := preload("res://Player/player.tscn") # Preload the player scene
 
-var level_data = {}  # Store all positions to draw
+@onready var tile_map := $Level
+
+var room_data = {}
+var corridor_data = {}
+var rooms = []
 
 func _ready() -> void:
 	_generate()
-	_draw()  # Triggers the _draw function
+	_draw()
+	_spawn_player()
 
 func _generate() -> void:
-	level_data.clear()
-	level_data = _generate_data()
+	room_data.clear()
+	corridor_data.clear()
+	rooms.clear()
+	_generate_data()
 
-func _generate_data() -> Dictionary:
+func _generate_data() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 
-	var data := {}
-	var rooms := []
 	for r in range(rooms_max):
-		var room := _get_random_room(rng)
+		var room = _get_random_room(rng)
 		if _intersects(rooms, room):
 			continue
 
-		_add_room(data, rooms, room)
+		_add_room(room)
 		if rooms.size() > 1:
 			var room_previous: Rect2 = rooms[-2]
-			_add_connection(rng, data, room_previous, room)
-	return data
+			_add_connection(rng, room_previous, room)
+		rooms.append(room)
 
 func _get_random_room(rng: RandomNumberGenerator) -> Rect2:
-	var width := rng.randi_range(rooms_size.x, rooms_size.y)
-	var height := rng.randi_range(rooms_size.x, rooms_size.y)
-	var x := rng.randi_range(0, level_size.x - width - 1)
-	var y := rng.randi_range(0, level_size.y - height - 1)
+	var width = rng.randi_range(rooms_size.x, rooms_size.y)
+	var height = rng.randi_range(rooms_size.x, rooms_size.y)
+	var x = rng.randi_range(0, level_size.x - width - 1)
+	var y = rng.randi_range(0, level_size.y - height - 1)
 	return Rect2(x, y, width, height)
 
-func _add_room(data: Dictionary, rooms: Array, room: Rect2) -> void:
-	rooms.push_back(room)
+func _add_room(room: Rect2) -> void:
 	for x in range(room.position.x, room.end.x):
 		for y in range(room.position.y, room.end.y):
-			data[Vector2(x, y)] = room_color  # Add room tiles to data with color
+			room_data[Vector2(x, y)] = true
 
-func _add_connection(rng: RandomNumberGenerator, data: Dictionary, room1: Rect2, room2: Rect2) -> void:
-	var room_center1 := (room1.position + room1.end) / 2
-	var room_center2 := (room2.position + room2.end) / 2
+func _add_connection(rng: RandomNumberGenerator, room1: Rect2, room2: Rect2) -> void:
+	var room_center1 = (room1.position + room1.end) / 2
+	var room_center2 = (room2.position + room2.end) / 2
 	if rng.randi_range(0, 1) == 0:
-		_add_corridor(data, room_center1.x, room_center2.x, room_center1.y, Vector2.AXIS_X)
-		_add_corridor(data, room_center1.y, room_center2.y, room_center2.x, Vector2.AXIS_Y)
+		_add_corridor(room_center1.x, room_center2.x, room_center1.y, Vector2.AXIS_X)
+		_add_corridor(room_center1.y, room_center2.y, room_center2.x, Vector2.AXIS_Y)
 	else:
-		_add_corridor(data, room_center1.y, room_center2.y, room_center1.x, Vector2.AXIS_Y)
-		_add_corridor(data, room_center1.x, room_center2.x, room_center2.y, Vector2.AXIS_X)
+		_add_corridor(room_center1.y, room_center2.y, room_center1.x, Vector2.AXIS_Y)
+		_add_corridor(room_center1.x, room_center2.x, room_center2.y, Vector2.AXIS_X)
 
-func _add_corridor(data: Dictionary, start: int, end: int, constant: int, axis: int) -> void:
+func _add_corridor(start: int, end: int, constant: int, axis: int) -> void:
 	for t in range(min(start, end), max(start, end) + 1):
-		var point := Vector2.ZERO
-		match axis:
-			Vector2.AXIS_X: point = Vector2(t, constant)
-			Vector2.AXIS_Y: point = Vector2(constant, t)
-		data[point] = corridor_color  # Add corridor tiles to data with color
+		for offset in range(-int(corridor_width / 2), int(corridor_width / 2) + 1):
+			var point = Vector2.ZERO
+			match axis:
+				Vector2.AXIS_X: point = Vector2(t, constant + offset)
+				Vector2.AXIS_Y: point = Vector2(constant + offset, t)
+			if point not in room_data:
+				corridor_data[point] = true
 
 func _intersects(rooms: Array, room: Rect2) -> bool:
-	var out := false
 	for room_other in rooms:
 		if room.intersects(room_other):
-			out = true
-			break
-	return out
+			return true
+	return false
 
-# Drawing function to render rooms and corridors as colored shapes
 func _draw() -> void:
-	var tile_size = Vector2(16, 16)  # Adjust the size of each "tile"
-	for position in level_data.keys():
-		var color = level_data[position]
-		draw_rect(Rect2(position * tile_size, tile_size), color)
+	print("Drawing dungeon...")
+
+	# Tiles for corridors
+	for position in corridor_data.keys():
+		#Floor tile
+		var random_x = randi_range(24, 27)
+		var random_y = randi_range(25, 27)
+		var coords = Vector2i(int(position.x / 16), int(position.y / 16))
+		tile_map.set_cell(coords, 0, Vector2i(random_x, random_y))
+
+	# Floor pattern
+	for position in room_data.keys():
+		var coords = Vector2i(int(position.x / 16), int(position.y / 16))
+
+		var random_x = randi_range(24, 27)
+		var random_y = randi_range(21, 23)
+		var atlas_coord = Vector2i(random_x, random_y)
+
+		tile_map.set_cell(coords, 0, atlas_coord)
+
+
+func _spawn_player() -> void:
+	if rooms.size() > 0:
+		var rng := RandomNumberGenerator.new()
+		rng.randomize()
+		var random_room = rooms[rng.randi_range(0, rooms.size() - 1)]
+		print("Selected room:", random_room.position)
+
+		var player = player_scene.instantiate()
+		
+		# Random position within the room
+		var random_x = rng.randi_range(random_room.position.x, random_room.position.x + random_room.size.x)
+		var random_y = rng.randi_range(random_room.position.y, random_room.position.y + random_room.size.y)
+
+		# Center the player on a tile
+		var tile_offset = Vector2(8, 8) 
+
+		var player_position = Vector2(random_x, random_y) + tile_offset
+		print("Spawning player at:", player_position) 
+		
+		player.position = player_position
+		add_child(player)
