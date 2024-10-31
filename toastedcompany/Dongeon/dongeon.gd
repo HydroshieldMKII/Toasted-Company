@@ -11,6 +11,7 @@ extends Node2D
 @onready var tile_map := $Level
 
 var room_data = {}
+var room_center = []
 var corridor_data = {}
 var rooms = []
 
@@ -39,15 +40,20 @@ func _generate_data() -> void:
 			var room_previous: Rect2 = rooms[-2]
 			_add_connection(rng, room_previous, room)
 		rooms.append(room)
+		room_center.append((room.position + room.end) / 2) 
+
 
 func _get_random_room(rng: RandomNumberGenerator) -> Rect2:
 	var width = rng.randi_range(rooms_size.x, rooms_size.y)
 	var height = rng.randi_range(rooms_size.x, rooms_size.y)
-	var x = rng.randi_range(0, level_size.x - width - 1)
-	var y = rng.randi_range(0, level_size.y - height - 1)
-	return Rect2(x, y, width, height)
+	# Ensure the room's top-left position keeps the room within level_size
+	var x = rng.randi_range(0, level_size.x - width)
+	var y = rng.randi_range(0, level_size.y - height)
+	return Rect2(Vector2(x, y), Vector2(width, height))
+
 
 func _add_room(room: Rect2) -> void:
+	# Use global positions for adding room tiles
 	for x in range(room.position.x, room.end.x):
 		for y in range(room.position.y, room.end.y):
 			room_data[Vector2(x, y)] = true
@@ -83,7 +89,7 @@ func _draw() -> void:
 
 	# Tiles for corridors
 	for position in corridor_data.keys():
-		#Floor tile
+		# Floor tile
 		var random_x = randi_range(24, 27)
 		var random_y = randi_range(25, 27)
 		var coords = Vector2i(int(position.x / 16), int(position.y / 16))
@@ -99,25 +105,20 @@ func _draw() -> void:
 
 		tile_map.set_cell(coords, 0, atlas_coord)
 
-
 func _spawn_player() -> void:
-	if rooms.size() > 0:
-		var rng := RandomNumberGenerator.new()
-		rng.randomize()
-		var random_room = rooms[rng.randi_range(0, rooms.size() - 1)]
-		print("Selected room:", random_room.position)
-
+	if room_center.size() > 0:
+		# Select a random room center
+		var random_room_center = room_center[randi() % room_center.size()]
+		
+		# Convert room center to global coordinates if needed
+		var player_position = self.to_global(random_room_center)
+		
 		var player = player_scene.instantiate()
+		player.global_position = player_position
 		
-		# Random position within the room
-		var random_x = rng.randi_range(random_room.position.x, random_room.position.x + random_room.size.x)
-		var random_y = rng.randi_range(random_room.position.y, random_room.position.y + random_room.size.y)
-
-		# Center the player on a tile
-		var tile_offset = Vector2(8, 8) 
-
-		var player_position = Vector2(random_x, random_y) + tile_offset
-		print("Spawning player at:", player_position) 
+		# Debugging info
+		print("Room center: ", random_room_center)
+		print("Player spawn position (global): ", player_position)
+		print("Player actual global position: ", player.global_position)
 		
-		player.position = player_position
 		add_child(player)

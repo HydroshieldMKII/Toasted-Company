@@ -28,7 +28,6 @@ func update(delta : float) -> void:
 	player.direction = dir
 
 func physics_update(delta: float) -> void:
-	
 	if (player.velocity.length() > 0) :
 		if (player.velocity.x > 0 or player.velocity.x < 0) :
 			anim_player.play("walk_side")
