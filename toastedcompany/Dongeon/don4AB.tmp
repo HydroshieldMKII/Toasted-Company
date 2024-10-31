@@ -1120,4 +1120,4 @@ scale = Vector2(5, 5)
 tile_set = SubResource("TileSet_hhawu")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-color = Color(0, 0, 0, 1)
+color = Color(0.0430392, 0.0430392, 0.0430392, 1)

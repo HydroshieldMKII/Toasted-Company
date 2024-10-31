@@ -1114,10 +1114,16 @@ sources/0 = SubResource("TileSetAtlasSource_a8cgw")
 
 [node name="Dongeon" type="Node2D"]
 script = ExtResource("1_0frh8")
+level_size = null
+rooms_size = null
+rooms_max = null
+corridor_width = null
+player_scene = null
+light_texture = null
 
 [node name="Level" type="TileMapLayer" parent="."]
 scale = Vector2(5, 5)
 tile_set = SubResource("TileSet_hhawu")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-color = Color(0, 0, 0, 1)
+color = Color(0.0430392, 0.0430392, 0.0430392, 1)

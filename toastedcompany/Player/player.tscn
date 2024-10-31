@@ -1,12 +1,14 @@
-[gd_scene load_steps=13 format=3 uid="uid://dwpl0ucshohks"]
+[gd_scene load_steps=14 format=3 uid="uid://dwpl0ucshohks"]
 
 [ext_resource type="Script" path="res://Player/player.gd" id="1_kww0b"]
+[ext_resource type="Texture2D" uid="uid://c28ovhuidbd7e" path="res://Assests/Light.png" id="2_64dd5"]
 [ext_resource type="Texture2D" uid="uid://dx8i2cmb7bsqv" path="res://Assests/Character.png" id="2_q7jl4"]
 [ext_resource type="Script" path="res://StateMachine/state_machine.gd" id="3_6r6ed"]
 [ext_resource type="Script" path="res://StateMachine/player_walk.gd" id="4_j5ccd"]
 [ext_resource type="Script" path="res://StateMachine/player_idle.gd" id="5_371nc"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_n75g3"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0t8at"]
+size = Vector2(75, 85)
 
 [sub_resource type="Animation" id="Animation_1xl30"]
 length = 0.001
@@ -104,8 +106,16 @@ _data = {
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_kww0b")
 
+[node name="DirectionalLight2D" type="DirectionalLight2D" parent="."]
+visible = false
+scale = Vector2(0.01, 0.01)
+energy = 3.0
+shadow_enabled = true
+height = 0.82
+max_distance = 1.0
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CapsuleShape2D_n75g3")
+shape = SubResource("RectangleShape2D_0t8at")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
@@ -133,3 +143,10 @@ player = NodePath("../..")
 [node name="Walk" type="Node" parent="StateMachine" node_paths=PackedStringArray("player")]
 script = ExtResource("4_j5ccd")
 player = NodePath("../..")
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+shadow_enabled = true
+shadow_color = Color(0.18359, 0.18359, 0.18359, 0)
+shadow_filter = 1
+texture = ExtResource("2_64dd5")
+texture_scale = 7.0

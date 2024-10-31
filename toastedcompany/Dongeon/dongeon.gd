@@ -3,8 +3,6 @@ extends Node2D
 @export var level_size := Vector2(1000, 750)
 @export var rooms_size := Vector2(100, 140)
 @export var rooms_max := 15
-@export var room_color := Color(0.3, 0.6, 1.0)
-@export var corridor_color := Color(0.9, 0.9, 0.9)
 @export var corridor_width := 12
 @export var player_scene := preload("res://Player/player.tscn") # Preload the player scene
 
@@ -16,13 +14,14 @@ var corridor_data = {}
 var rooms = []
 
 const TILE_SIZE := 16
-const SCALE_FACTOR := 5  # Scale factor for tiles when drawing
+const SCALE_FACTOR := 5 # Scale factor for tiles when drawing
 const SCALED_TILE_SIZE := TILE_SIZE * SCALE_FACTOR
 
 func _ready() -> void:
 	_generate()
 	_draw()
 	_spawn_player()
+
 
 func _generate() -> void:
 	room_data.clear()
@@ -44,7 +43,7 @@ func _generate_data() -> void:
 			var room_previous: Rect2 = rooms[-2]
 			_add_connection(rng, room_previous, room)
 		rooms.append(room)
-		room_center.append((room.position + room.end) / 2) 
+		room_center.append((room.position + room.end) / 2)
 
 
 func _get_random_room(rng: RandomNumberGenerator) -> Rect2:
@@ -111,18 +110,12 @@ func _draw() -> void:
 
 func _spawn_player() -> void:
 	if room_center.size() > 0:
-		# Select a random room center
+		# Choose a random room center
 		var random_room_center = room_center[randi() % room_center.size()]
 		
-		# Scale the player spawn position by the SCALE_FACTOR
+		# Calculate the player position and instantiate the player
 		var player_position = random_room_center * SCALE_FACTOR
-		
 		var player = player_scene.instantiate()
 		player.global_position = player_position
-
-		# Debugging info
-		print("Room center (original): ", random_room_center)
-		print("Player spawn position (scaled): ", player_position)
-		print("Player actual global position: ", player.global_position)
-
+		player.z_index = 1
 		add_child(player)

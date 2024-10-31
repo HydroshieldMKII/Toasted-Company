@@ -6,6 +6,5 @@ func _ready() -> void:
 	sprite = $Sprite
 	anim_player.play("idle")
 
-
 func _physics_process(delta: float) -> void:
 	move_and_slide()

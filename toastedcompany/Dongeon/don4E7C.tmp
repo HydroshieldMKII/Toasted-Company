@@ -1118,6 +1118,3 @@ script = ExtResource("1_0frh8")
 [node name="Level" type="TileMapLayer" parent="."]
 scale = Vector2(5, 5)
 tile_set = SubResource("TileSet_hhawu")
-
-[node name="CanvasModulate" type="CanvasModulate" parent="."]
-color = Color(0, 0, 0, 1)
