@@ -15,6 +15,10 @@ var room_center = []
 var corridor_data = {}
 var rooms = []
 
+const TILE_SIZE := 16
+const SCALE_FACTOR := 5  # Scale factor for tiles when drawing
+const SCALED_TILE_SIZE := TILE_SIZE * SCALE_FACTOR
+
 func _ready() -> void:
 	_generate()
 	_draw()
@@ -110,15 +114,15 @@ func _spawn_player() -> void:
 		# Select a random room center
 		var random_room_center = room_center[randi() % room_center.size()]
 		
-		# Convert room center to global coordinates if needed
-		var player_position = self.to_global(random_room_center)
+		# Scale the player spawn position by the SCALE_FACTOR
+		var player_position = random_room_center * SCALE_FACTOR
 		
 		var player = player_scene.instantiate()
 		player.global_position = player_position
-		
+
 		# Debugging info
-		print("Room center: ", random_room_center)
-		print("Player spawn position (global): ", player_position)
+		print("Room center (original): ", random_room_center)
+		print("Player spawn position (scaled): ", player_position)
 		print("Player actual global position: ", player.global_position)
-		
+
 		add_child(player)
