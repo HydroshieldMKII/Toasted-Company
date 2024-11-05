@@ -104,57 +104,83 @@ func _intersects(rooms: Array, room: Rect2) -> bool:
 	return false
 
 func _generate_occluders() -> void:
-	# Clear any existing occluders
+	# Clear any existing occluders and collision bodies
 	for child in get_children():
 		if child is LightOccluder2D:
 			child.queue_free()
+		elif child is StaticBody2D:
+			child.queue_free()
 
-	# Check all tiles diretion (up, down, left, right) and add occluders if no tile is present
+	# Check all tiles and add occluders where there are walls but not on corridors
 	for x in range(0, level_size.x):
 		for y in range(0, level_size.y):
 			var tile = tile_map.get_cell_source_id(Vector2i(x, y))
-			if tile == -1:
+
+			# Skip if no tile exists or if it's part of a corridor
+			if tile == -1 or corridor_data.has(Vector2(x, y)):
 				continue
-			else:
-				# Check if there is a tile in the direction
-				var up = tile_map.get_cell_source_id(Vector2i(x, y - 1))
-				var down = tile_map.get_cell_source_id(Vector2i(x, y + 1))
-				var left = tile_map.get_cell_source_id(Vector2i(x - 1, y))
-				var right = tile_map.get_cell_source_id(Vector2i(x + 1, y))
 
-				var occluder = LightOccluder2D.new()
-				var polygon = OccluderPolygon2D.new()
-				var points = PackedVector2Array()
-			
-					
-				# Add occluders if no tile is present in the tile direction
-				if up == -1:
-					points.push_back(Vector2(x * SCALED_TILE_SIZE, y * SCALED_TILE_SIZE))
-					points.push_back(Vector2((x + 1) * SCALED_TILE_SIZE, y * SCALED_TILE_SIZE))
-				if down == -1:
-					points.push_back(Vector2((x + 1) * SCALED_TILE_SIZE, (y + 1) * SCALED_TILE_SIZE))
-					points.push_back(Vector2(x * SCALED_TILE_SIZE, (y + 1) * SCALED_TILE_SIZE))
-				if left == -1:
-					points.push_back(Vector2(x * SCALED_TILE_SIZE, y * SCALED_TILE_SIZE))
-					points.push_back(Vector2(x * SCALED_TILE_SIZE, (y + 1) * SCALED_TILE_SIZE))
-				if right == -1:
-					points.push_back(Vector2((x + 1) * SCALED_TILE_SIZE, y * SCALED_TILE_SIZE))
-					points.push_back(Vector2((x + 1) * SCALED_TILE_SIZE, (y + 1) * SCALED_TILE_SIZE))
-				
-				if points.size() != 0:
-					polygon.polygon = points
-					occluder.occluder = polygon
-					add_child(occluder)
-					
-					#var body = StaticBody2D.new()
-					#var polygon_shape = CollisionPolygon2D.new()
-					#polygon_shape.polygon = points
-					#body.add_child(polygon_shape)
-					#add_child(body)
+			# Check the surrounding tiles (up, down, left, right) to determine where occluders and walls are needed
+			var up = tile_map.get_cell_source_id(Vector2i(x, y - 1))
+			var down = tile_map.get_cell_source_id(Vector2i(x, y + 1))
+			var left = tile_map.get_cell_source_id(Vector2i(x - 1, y))
+			var right = tile_map.get_cell_source_id(Vector2i(x + 1, y))
 
+			# Add occluder and collision bodies
+			if up == -1:
+				_create_wall(x, y, 0) # Wall above
+			if down == -1:
+				_create_wall(x, y, 1) # Wall below
+			if left == -1:
+				_create_wall(x, y, 2) # Wall to the left
+			if right == -1:
+				_create_wall(x, y, 3) # Wall to the right
 
-	print("Occluder done")
-				
+func _create_wall(x, y, direction) -> void:
+	var body = StaticBody2D.new()
+	var polygon_shape = CollisionPolygon2D.new()
+	var points = PackedVector2Array()
+
+	var wall_thickness = 10
+	var top_left = Vector2(x * SCALED_TILE_SIZE, y * SCALED_TILE_SIZE)
+	var bottom_right = Vector2((x + 1) * SCALED_TILE_SIZE, (y + 1) * SCALED_TILE_SIZE)
+
+	# Rectangles based on direction
+	if direction == 0: # Wall above
+		points.push_back(top_left)
+		points.push_back(Vector2(top_left.x + SCALED_TILE_SIZE, top_left.y))
+		points.push_back(Vector2(top_left.x + SCALED_TILE_SIZE, top_left.y - wall_thickness))
+		points.push_back(Vector2(top_left.x, top_left.y - wall_thickness))
+	elif direction == 1: # Wall below
+		points.push_back(Vector2(top_left.x, bottom_right.y))
+		points.push_back(Vector2(top_left.x + SCALED_TILE_SIZE, bottom_right.y))
+		points.push_back(Vector2(top_left.x + SCALED_TILE_SIZE, bottom_right.y + wall_thickness))
+		points.push_back(Vector2(top_left.x, bottom_right.y + wall_thickness))
+	elif direction == 2: # Wall to the left
+		points.push_back(top_left)
+		points.push_back(Vector2(top_left.x - wall_thickness, top_left.y))
+		points.push_back(Vector2(top_left.x - wall_thickness, top_left.y + SCALED_TILE_SIZE))
+		points.push_back(Vector2(top_left.x, top_left.y + SCALED_TILE_SIZE))
+	elif direction == 3: # Wall to the right
+		points.push_back(Vector2(bottom_right.x, top_left.y))
+		points.push_back(Vector2(bottom_right.x + wall_thickness, top_left.y))
+		points.push_back(Vector2(bottom_right.x + wall_thickness, top_left.y + SCALED_TILE_SIZE))
+		points.push_back(Vector2(bottom_right.x, top_left.y + SCALED_TILE_SIZE))
+
+	polygon_shape.polygon = points
+	body.add_child(polygon_shape)
+
+	body.collision_layer = 1 # Wall collision layer
+	body.collision_mask = 1 # Player collision layer
+
+	add_child(body)
+
+	var occluder = LightOccluder2D.new()
+	var occluder_polygon = OccluderPolygon2D.new()
+	occluder_polygon.polygon = points
+	occluder.occluder = occluder_polygon
+	add_child(occluder)
+
 
 func _draw() -> void:
 	if map_drawn:
@@ -190,5 +216,4 @@ func _spawn_player() -> void:
 		var player_position = random_room_center * SCALE_FACTOR
 		var player = player_scene.instantiate()
 		player.global_position = player_position
-		player.z_index = 1
 		add_child(player)
