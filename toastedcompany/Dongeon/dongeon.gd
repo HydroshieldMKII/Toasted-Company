@@ -3,7 +3,7 @@ extends Node2D
 @export var level_size := Vector2(1000, 750)
 @export var rooms_size := Vector2(100, 140)
 @export var rooms_max := 15
-@export var corridor_width := 12
+@export var corridor_width := 16
 @export var player_scene := preload("res://Player/player.tscn") # Preload the player scene
 
 @onready var tile_map := $Level
@@ -14,13 +14,31 @@ var corridor_data = {}
 var rooms = []
 
 const TILE_SIZE := 16
-const SCALE_FACTOR := 5 # Scale factor for tiles when drawing
+const SCALE_FACTOR := 5 # Scale factor for tiles when drawing, must match tile scaling
 const SCALED_TILE_SIZE := TILE_SIZE * SCALE_FACTOR
 
+var is_dead = false
+var map_drawn = false
+
 func _ready() -> void:
-	_generate()
-	_draw()
-	_spawn_player()
+	if not map_drawn:
+		_generate()
+		_draw()
+		_generate_occluders()
+		_spawn_player()
+	
+func _process(delta: float) -> void:
+	#check_if_player_on_ground()
+	pass
+
+func check_if_player_on_ground() -> void:
+	# Check if player on a tile
+	var player_position = $Player.global_position
+	var player_tile_position = Vector2i(int(player_position.x / SCALED_TILE_SIZE), int(player_position.y / SCALED_TILE_SIZE))
+	var tile = tile_map.get_cell_source_id(player_tile_position)
+	if $Player and tile == -1 and not DongeonGlobal.is_player_dead:
+		DongeonGlobal.is_player_dead = true
+		$Player.anim_player.play("fall")
 
 
 func _generate() -> void:
@@ -87,7 +105,56 @@ func _intersects(rooms: Array, room: Rect2) -> bool:
 			return true
 	return false
 
+func _generate_occluders() -> void:
+	# Clear any existing occluders if you plan to regenerate them
+	for child in get_children():
+		if child is LightOccluder2D:
+			child.queue_free()
+
+	# Check all tiles diretion (up, down, left, right) and add occluders if no tile is present
+	for x in range(0, level_size.x):
+		for y in range(0, level_size.y):
+			var tile = tile_map.get_cell_source_id(Vector2i(x, y))
+			if tile == -1:
+				continue
+			else:
+				# Check if there is a tile in the direction
+				var up = tile_map.get_cell_source_id(Vector2i(x, y - 1))
+				var down = tile_map.get_cell_source_id(Vector2i(x, y + 1))
+				var left = tile_map.get_cell_source_id(Vector2i(x - 1, y))
+				var right = tile_map.get_cell_source_id(Vector2i(x + 1, y))
+
+				var occluder = LightOccluder2D.new()
+				var polygon = OccluderPolygon2D.new()
+				var points = PackedVector2Array()
+					
+				# Add occluders if no tile is present in the tile direction
+				if up == -1:
+					points.push_back(Vector2(x * SCALED_TILE_SIZE, y * SCALED_TILE_SIZE))
+					points.push_back(Vector2((x + 1) * SCALED_TILE_SIZE, y * SCALED_TILE_SIZE))
+				if down == -1:
+					points.push_back(Vector2((x + 1) * SCALED_TILE_SIZE, (y + 1) * SCALED_TILE_SIZE))
+					points.push_back(Vector2(x * SCALED_TILE_SIZE, (y + 1) * SCALED_TILE_SIZE))
+				if left == -1:
+					points.push_back(Vector2(x * SCALED_TILE_SIZE, y * SCALED_TILE_SIZE))
+					points.push_back(Vector2(x * SCALED_TILE_SIZE, (y + 1) * SCALED_TILE_SIZE))
+				if right == -1:
+					points.push_back(Vector2((x + 1) * SCALED_TILE_SIZE, y * SCALED_TILE_SIZE))
+					points.push_back(Vector2((x + 1) * SCALED_TILE_SIZE, (y + 1) * SCALED_TILE_SIZE))
+				
+				if points.size() != 0:
+					polygon.polygon = points
+					occluder.light_mask = 1
+					occluder.occluder = polygon
+					add_child(occluder)
+	print("Occluder done")
+				
+
 func _draw() -> void:
+	if map_drawn:
+		return
+	else:
+		map_drawn = true
 	print("Drawing dungeon...")
 
 	# Tiles for corridors

@@ -1317,7 +1317,6 @@ texture = ExtResource("2_gjgnu")
 24:25/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_hhawu"]
-occlusion_layer_0/light_mask = 513
 terrain_set_0/mode = 0
 terrain_set_0/terrain_0/name = "ground"
 terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
@@ -1337,5 +1336,4 @@ scale = Vector2(5, 5)
 tile_set = SubResource("TileSet_hhawu")
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-visible = false
 color = Color(0, 0, 0, 1)

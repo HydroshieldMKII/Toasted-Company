@@ -14,6 +14,10 @@ func update(delta : float) -> void:
 	if not anim_player :
 		anim_player = player.get_animation_player()
 
+	if DongeonGlobal.is_player_dead: 
+		player.velocity = Vector2i.ZERO
+		return
+	
 	var dir := manage_input()
 	
 	if dir.length() > 0 :
