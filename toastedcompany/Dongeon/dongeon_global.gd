@@ -1,8 +1,7 @@
 extends Node
 class_name DongeonGlob
 
-var is_player_dead := false
-
+var player_can_move = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

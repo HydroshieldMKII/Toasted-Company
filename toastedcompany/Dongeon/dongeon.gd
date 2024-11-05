@@ -14,7 +14,7 @@ var corridor_data = {}
 var rooms = []
 
 const TILE_SIZE := 16
-const SCALE_FACTOR := 5 # Scale factor for tiles when drawing, must match tile scaling
+const SCALE_FACTOR := 5
 const SCALED_TILE_SIZE := TILE_SIZE * SCALE_FACTOR
 
 var is_dead = false
@@ -28,17 +28,15 @@ func _ready() -> void:
 		_spawn_player()
 	
 func _process(delta: float) -> void:
-	#check_if_player_on_ground()
-	pass
+	update_player_location()
 
-func check_if_player_on_ground() -> void:
+func update_player_location() -> void:
 	# Check if player on a tile
 	var player_position = $Player.global_position
-	var player_tile_position = Vector2i(int(player_position.x / SCALED_TILE_SIZE), int(player_position.y / SCALED_TILE_SIZE))
+	var player_tile_position = Vector2i(int(player_position.x / SCALED_TILE_SIZE) + 1, int(player_position.y / SCALED_TILE_SIZE) + 1) # Check ahead
 	var tile = tile_map.get_cell_source_id(player_tile_position)
-	if $Player and tile == -1 and not DongeonGlobal.is_player_dead:
-		DongeonGlobal.is_player_dead = true
-		$Player.anim_player.play("fall")
+	#if $Player and tile == -1:
+		#DongeonGlobal.player_can_move = false
 
 
 func _generate() -> void:
@@ -106,7 +104,7 @@ func _intersects(rooms: Array, room: Rect2) -> bool:
 	return false
 
 func _generate_occluders() -> void:
-	# Clear any existing occluders if you plan to regenerate them
+	# Clear any existing occluders
 	for child in get_children():
 		if child is LightOccluder2D:
 			child.queue_free()
@@ -127,6 +125,7 @@ func _generate_occluders() -> void:
 				var occluder = LightOccluder2D.new()
 				var polygon = OccluderPolygon2D.new()
 				var points = PackedVector2Array()
+			
 					
 				# Add occluders if no tile is present in the tile direction
 				if up == -1:
@@ -144,9 +143,16 @@ func _generate_occluders() -> void:
 				
 				if points.size() != 0:
 					polygon.polygon = points
-					occluder.light_mask = 1
 					occluder.occluder = polygon
 					add_child(occluder)
+					
+					#var body = StaticBody2D.new()
+					#var polygon_shape = CollisionPolygon2D.new()
+					#polygon_shape.polygon = points
+					#body.add_child(polygon_shape)
+					#add_child(body)
+
+
 	print("Occluder done")
 				
 

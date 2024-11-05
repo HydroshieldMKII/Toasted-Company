@@ -1,11 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://bx71rm312ra06"]
+[gd_scene load_steps=4 format=3 uid="uid://bx71rm312ra06"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_q3pa2"]
 [ext_resource type="Texture2D" uid="uid://hjq1q1bwcffh" path="res://icon.svg" id="2_cg7np"]
 [ext_resource type="PackedScene" uid="uid://lvs5y87hseuc" path="res://Dongeon/dongeon.tscn" id="4_indql"]
-
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_jwvb4"]
-polygon = PackedVector2Array(-53, -106, -161, 982, 2567, 874, 2119, -262)
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_q3pa2")
@@ -16,7 +13,3 @@ position = Vector2(146, 123)
 texture = ExtResource("2_cg7np")
 
 [node name="Dongeon" parent="." instance=ExtResource("4_indql")]
-
-[node name="LightOccluder2D" type="LightOccluder2D" parent="."]
-visible = false
-occluder = SubResource("OccluderPolygon2D_jwvb4")

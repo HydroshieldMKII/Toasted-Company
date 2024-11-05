@@ -153,7 +153,6 @@ position = Vector2(-0.5, -5)
 shape = SubResource("RectangleShape2D_0t8at")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(0.4, 0.4)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -183,11 +182,13 @@ script = ExtResource("4_j5ccd")
 player = NodePath("../..")
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
+color = Color(0.720467, 0.720468, 0.720467, 1)
 shadow_enabled = true
 shadow_color = Color(0, 0, 0, 0.909804)
 shadow_filter = 2
+shadow_filter_smooth = 2.0
 texture = ExtResource("2_64dd5")
-texture_scale = 7.0
+texture_scale = 12.0
 
 [node name="FlashTimer" type="Timer" parent="."]
 one_shot = true
