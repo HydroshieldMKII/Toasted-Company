@@ -138,6 +138,7 @@ shader_parameter/flash_color = Color(1, 1, 1, 1)
 shader_parameter/flash_modifier = 0.0
 
 [node name="Player" type="CharacterBody2D"]
+z_index = 10
 script = ExtResource("1_kww0b")
 
 [node name="DirectionalLight2D" type="DirectionalLight2D" parent="."]

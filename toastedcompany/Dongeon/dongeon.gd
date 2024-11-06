@@ -5,6 +5,7 @@ extends Node2D
 @export var rooms_max := 15
 @export var corridor_width := 16
 @export var player_scene := preload("res://Player/player.tscn") # Preload the player scene
+@onready var fog: CanvasModulate = $Fog
 
 @onready var tile_map := $Level
 
@@ -28,16 +29,32 @@ func _ready() -> void:
 		_spawn_player()
 	
 func _process(delta: float) -> void:
-	update_player_location()
+	if Input.is_action_just_pressed("f_key"): # toggle fog of war
+		$Fog.visible = not $Fog.visible
 
-func update_player_location() -> void:
-	# Check if player on a tile
-	var player_position = $Player.global_position
-	var player_tile_position = Vector2i(int(player_position.x / SCALED_TILE_SIZE) + 1, int(player_position.y / SCALED_TILE_SIZE) + 1) # Check ahead
-	var tile = tile_map.get_cell_source_id(player_tile_position)
-	#if $Player and tile == -1:
-		#DongeonGlobal.player_can_move = false
+	if Input.is_action_just_pressed("minus"): # zoom out
+		$Player.get_node("Camera2D").zoom /= 1.3
 
+	if Input.is_action_just_pressed("equal"): # zoom in
+		$Player.get_node("Camera2D").zoom *= 1.3
+
+	if Input.is_action_just_pressed("r"): # reset the game
+		get_tree().reload_current_scene()
+
+	if Input.is_action_just_pressed("l_bracket"): # decrease light radius
+		$Player.get_node("PointLight2D").texture_scale -= 1
+		
+	if Input.is_action_just_pressed("r_bracket"): # increase light radiu
+		$Player.get_node("PointLight2D").texture_scale += 1
+
+	if Input.is_action_just_pressed("semicol"): # decrease player speed
+		$Player.get_node("StateMachine/Walk").move_speed -= 25
+
+	if Input.is_action_just_pressed("quote"): # increase player speed
+		$Player.get_node("StateMachine/Walk").move_speed += 25
+		
+	if Input.is_action_just_pressed("g"): # toggle player collision
+		$Player.get_node("CollisionShape2D").disabled = not $Player.get_node("CollisionShape2D").disabled
 
 func _generate() -> void:
 	room_data.clear()
@@ -206,6 +223,39 @@ func _draw() -> void:
 		var atlas_coord = Vector2i(random_x, random_y)
 
 		tile_map.set_cell(coords, 0, atlas_coord)
+		
+func _spawn_random_tunnel(closed: bool) -> void:
+	if room_center.size() > 0:
+		# Choose a random room center
+		var random_room_center = room_center[randi() % room_center.size()]
+
+		# Calculate the top-left corner of the tunnel area, centered at the room center.
+		# Adjust for the tunnel width and scale.
+		var top_left_x = random_room_center.x - (3 * TILE_SIZE * SCALE_FACTOR) / 6
+		var top_left_y = random_room_center.y - (3 * TILE_SIZE * SCALE_FACTOR) / 6
+
+		# Create a new TileMap layer for the tunnel (closed or open)
+		var tunnel_tile_map = TileMapLayer.new()
+		tunnel_tile_map.tile_set = tile_map.tile_set
+		tunnel_tile_map.scale = Vector2(SCALE_FACTOR, SCALE_FACTOR)
+
+		if closed:
+			for i in range(6):
+				for j in range(6):
+					# Calculate the exact tile position based on the scale and tile size
+					var tile_x = int((top_left_x + i * TILE_SIZE) / TILE_SIZE)
+					var tile_y = int((top_left_y + j * TILE_SIZE) / TILE_SIZE)
+					var tile_coord = Vector2i(tile_x, tile_y)
+					
+					# Set atlas coordinates for the tile (example coordinates used here)
+					var atlas_coord = Vector2i(30 + i, 12 + j)
+					tunnel_tile_map.set_cell(tile_coord, 0, atlas_coord)
+		else:
+			print("Tunnel opened, state:", closed)
+
+		add_child(tunnel_tile_map)
+		print("Tunnel spawned at room center:", random_room_center, ", closed state:", closed)
+
 
 func _spawn_player() -> void:
 	if room_center.size() > 0:
@@ -217,3 +267,7 @@ func _spawn_player() -> void:
 		var player = player_scene.instantiate()
 		player.global_position = player_position
 		add_child(player)
+		
+		print("Player spawn pos: ", player_position)
+
+		_spawn_random_tunnel(true)
