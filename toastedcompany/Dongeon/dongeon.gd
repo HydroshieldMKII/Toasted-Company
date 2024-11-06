@@ -20,10 +20,6 @@ const SCALED_TILE_SIZE := TILE_SIZE * SCALE_FACTOR
 
 var map_drawn = false
 
-signal player_collect_item
-
-var inventory := []
-
 func _ready() -> void:
 	if not map_drawn:
 		_generate_dongeon_data()
@@ -320,5 +316,15 @@ func _spawn_player() -> void:
 
 func _on_player_collect_item(item_name: String, value: int) -> void:
 	print("Player collected item: ", item_name, " with value: ", value)
-	# emit_signal("player_collect_item", item_name, value)
-	# _spawn_random_items(1)
+
+	# Hotbar (canvas layer) > PanelContainer > MarginContainer > GridContainer > TextureRect (item icon)
+	var hotbar = $Player.get_node("Hotbar")
+	var item1 = hotbar.get_node("PanelContainer/MarginContainer/GridContainer/TextureRect")
+	var item2 = hotbar.get_node("PanelContainer/MarginContainer/GridContainer/TextureRect2")
+
+	if item1.texture == null:
+		item1.texture = load("res://Assests/Items/" + item_name + ".png")
+		item1.modulate = Color(1, 1, 1, 1)
+	else:
+		item2.texture = load("res://Assests/Items/" + item_name + ".png")
+		item2.modulate = Color(1, 1, 1, 1)
