@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://coxuf6ake3jo6"
-path="res://.godot/imported/candleA_03.png-dad7e29efa061cc863257bd241b5c458.ctex"
+uid="uid://bw26gq0vuyrrq"
+path="res://.godot/imported/croissant.png-8020074a12ced1d3ed259bbf371ec2cf.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assests/candleA_03.png"
-dest_files=["res://.godot/imported/candleA_03.png-dad7e29efa061cc863257bd241b5c458.ctex"]
+source_file="res://Assests/Items/croissant.png"
+dest_files=["res://.godot/imported/croissant.png-8020074a12ced1d3ed259bbf371ec2cf.ctex"]
 
 [params]
 

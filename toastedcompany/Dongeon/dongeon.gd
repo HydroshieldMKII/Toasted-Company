@@ -37,6 +37,8 @@ func _process(delta: float) -> void:
 
 func _check_item_collection() -> void:
 	# Get all items in the "items" group and check if the player is overlapping with any of them
+	if not get_tree():
+		return
 	var items = get_tree().get_nodes_in_group("items")
 	if items.size() == 0:
 		return
@@ -55,7 +57,7 @@ func _check_item_collection() -> void:
 		var player_overlapping = player_area.get_overlapping_areas()
 		#print(player_overlapping)
 		if player_area.has_overlapping_areas():
-			print("OBJ!!")
+			print("Item overlapping: ", player_overlapping)
 			
 		for area in player_overlapping:
 			if area.is_in_group("items"):

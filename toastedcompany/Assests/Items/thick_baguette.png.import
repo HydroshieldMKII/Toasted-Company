@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ivtggoeyo6a5"
-path="res://.godot/imported/candleB_04.png-10d52fa1b35a4bb8f729e3c5356532c5.ctex"
+uid="uid://bm0tgt81246gp"
+path="res://.godot/imported/thick_baguette.png-38d1888f8d4a57e4f543824a61763829.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assests/candleB_04.png"
-dest_files=["res://.godot/imported/candleB_04.png-10d52fa1b35a4bb8f729e3c5356532c5.ctex"]
+source_file="res://Assests/Items/thick_baguette.png"
+dest_files=["res://.godot/imported/thick_baguette.png-38d1888f8d4a57e4f543824a61763829.ctex"]
 
 [params]
 

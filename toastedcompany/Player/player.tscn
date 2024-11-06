@@ -8,9 +8,8 @@
 [ext_resource type="Script" path="res://StateMachine/player_walk.gd" id="4_j5ccd"]
 [ext_resource type="Script" path="res://StateMachine/player_idle.gd" id="5_371nc"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_j0olu"]
-radius = 41.5
-height = 114.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_aklre"]
+size = Vector2(81, 98)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tmtka"]
 size = Vector2(72, 88)
@@ -154,8 +153,8 @@ height = 0.82
 max_distance = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-0.5, -5)
-shape = SubResource("CapsuleShape2D_j0olu")
+position = Vector2(-0.5, -4)
+shape = SubResource("RectangleShape2D_aklre")
 
 [node name="Area2D" type="Area2D" parent="."]
 

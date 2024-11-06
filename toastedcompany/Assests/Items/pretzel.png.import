@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cunysgf7a0k82"
-path="res://.godot/imported/torch_2.png-e938ab766748642b39ea1c33ceab2ead.ctex"
+uid="uid://k4e63ltamnd4"
+path="res://.godot/imported/pretzel.png-6747dfb3e9940d41b9b5750ac216e873.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assests/torch_2.png"
-dest_files=["res://.godot/imported/torch_2.png-e938ab766748642b39ea1c33ceab2ead.ctex"]
+source_file="res://Assests/Items/pretzel.png"
+dest_files=["res://.godot/imported/pretzel.png-6747dfb3e9940d41b9b5750ac216e873.ctex"]
 
 [params]
 
