@@ -18,7 +18,6 @@ const TILE_SIZE := 16
 const SCALE_FACTOR := 5
 const SCALED_TILE_SIZE := TILE_SIZE * SCALE_FACTOR
 
-var is_dead = false
 var map_drawn = false
 
 func _ready() -> void:
@@ -255,6 +254,23 @@ func _spawn_random_tunnel(closed: bool) -> void:
 
 		add_child(tunnel_tile_map)
 		print("Tunnel spawned at room center:", random_room_center, ", closed state:", closed)
+	
+func _spawn_random_items(level: int) -> void:
+	# Spawn items in random rooms
+	var item_sceen = preload("res://Items/item.tscn")
+	var item = item_sceen.instantiate()
+
+	if room_center.size() > 0:
+		var random_room_center = room_center[randi() % room_center.size()]
+		var item_position = random_room_center * SCALE_FACTOR
+		item_position.x += randi() % 16
+		item_position.y += randi() % 16
+		
+		item.global_position = item_position
+		item.z_index = 9
+		
+		add_child(item)
+		print("Item spawned at:", item_position)
 
 
 func _spawn_player() -> void:
@@ -271,3 +287,4 @@ func _spawn_player() -> void:
 		print("Player spawn pos: ", player_position)
 
 		_spawn_random_tunnel(true)
+		_spawn_random_items(0)

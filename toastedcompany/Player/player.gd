@@ -2,10 +2,10 @@ extends GenericCharacter
 class_name Player
 
 @onready var timer : Timer = $FlashTimer
-const NB_FLASH : int = 8
+const NB_FLASH : int = 16
 var flash_counter : int
 var flash_value : int = 0
-var timer_timout_executed = false
+var timer_timout_executed = true
 
 func _ready() -> void:
 	anim_player = $AnimationPlayer
@@ -32,7 +32,6 @@ func _on_flashtimer_timeout() -> void:
 		flash_counter += 1
 	else:
 		timer_timout_executed = true
-		print("shader off")
 		
 		flash_counter = 0
 		shader.set_shader_parameter("flash_modifier", 0);
