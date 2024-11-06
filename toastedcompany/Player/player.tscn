@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://dwpl0ucshohks"]
+[gd_scene load_steps=18 format=3 uid="uid://dwpl0ucshohks"]
 
 [ext_resource type="Script" path="res://Player/player.gd" id="1_kww0b"]
 [ext_resource type="Shader" path="res://Player/blinkwhite.gdshader" id="2_27l2l"]
@@ -8,8 +8,12 @@
 [ext_resource type="Script" path="res://StateMachine/player_walk.gd" id="4_j5ccd"]
 [ext_resource type="Script" path="res://StateMachine/player_idle.gd" id="5_371nc"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_0t8at"]
-size = Vector2(73, 88)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_j0olu"]
+radius = 41.5
+height = 114.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tmtka"]
+size = Vector2(72, 88)
 
 [sub_resource type="Animation" id="Animation_1xl30"]
 length = 0.001
@@ -151,7 +155,13 @@ max_distance = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-0.5, -5)
-shape = SubResource("RectangleShape2D_0t8at")
+shape = SubResource("CapsuleShape2D_j0olu")
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(-1, -6)
+shape = SubResource("RectangleShape2D_tmtka")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 

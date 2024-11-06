@@ -24,10 +24,6 @@ func update(delta: float) -> void:
 	if (player.velocity.length() == 0):
 		#print("Transitionned to idle")
 		Transitioned.emit(self, "idle")
-
-	# Check if player on a tile
-	if not DongeonGlobal.player_can_move:
-		player.velocity = Vector2.ZERO
 	
 	player.direction = dir
 

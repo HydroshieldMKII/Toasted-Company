@@ -1338,3 +1338,5 @@ tile_set = SubResource("TileSet_hhawu")
 
 [node name="Fog" type="CanvasModulate" parent="."]
 color = Color(0, 0, 0, 1)
+
+[connection signal="player_collect_item" from="." to="." method="_on_player_collect_item"]

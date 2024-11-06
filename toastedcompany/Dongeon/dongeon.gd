@@ -20,14 +20,52 @@ const SCALED_TILE_SIZE := TILE_SIZE * SCALE_FACTOR
 
 var map_drawn = false
 
+signal player_collect_item
+
+var inventory := []
+
 func _ready() -> void:
 	if not map_drawn:
-		_generate()
-		_draw()
-		_generate_occluders()
+		_generate_dongeon_data()
+		_draw_terrains()
+		_generate_occluders_collisions()
 		_spawn_player()
 	
 func _process(delta: float) -> void:
+	_manage_input()
+	_check_item_collection()
+
+func _check_item_collection() -> void:
+	# Get all items in the "items" group and check if the player is overlapping with any of them
+	var items = get_tree().get_nodes_in_group("items")
+	if items.size() == 0:
+		return
+
+	#print("Checking items")
+	for item in items:
+		var player_area = $Player.get_node("Area2D")
+		var item_area = item.get_node("Area2D")
+
+		# Ensure both player and item have Area2D components
+		if player_area == null or item_area == null:
+			print("Missing Area2D on player or item!")
+			continue
+
+		# Check for overlap using get_overlapping_bodies (it returns an array of bodies)
+		var player_overlapping = player_area.get_overlapping_areas()
+		#print(player_overlapping)
+		if player_area.has_overlapping_areas():
+			print("OBJ!!")
+			
+		for area in player_overlapping:
+			if area.is_in_group("items"):
+				print("Item found!")
+				item.queue_free()
+				emit_signal("player_collect_item")
+				break
+
+
+func _manage_input() -> void:
 	if Input.is_action_just_pressed("f_key"): # toggle fog of war
 		$Fog.visible = not $Fog.visible
 
@@ -55,7 +93,7 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("g"): # toggle player collision
 		$Player.get_node("CollisionShape2D").disabled = not $Player.get_node("CollisionShape2D").disabled
 
-func _generate() -> void:
+func _generate_dongeon_data() -> void:
 	room_data.clear()
 	corridor_data.clear()
 	rooms.clear()
@@ -77,7 +115,6 @@ func _generate_data() -> void:
 		rooms.append(room)
 		room_center.append((room.position + room.end) / 2)
 
-
 func _get_random_room(rng: RandomNumberGenerator) -> Rect2:
 	var width = rng.randi_range(rooms_size.x, rooms_size.y)
 	var height = rng.randi_range(rooms_size.x, rooms_size.y)
@@ -85,7 +122,6 @@ func _get_random_room(rng: RandomNumberGenerator) -> Rect2:
 	var x = rng.randi_range(0, level_size.x - width)
 	var y = rng.randi_range(0, level_size.y - height)
 	return Rect2(Vector2(x, y), Vector2(width, height))
-
 
 func _add_room(room: Rect2) -> void:
 	# Use global positions for adding room tiles
@@ -119,7 +155,7 @@ func _intersects(rooms: Array, room: Rect2) -> bool:
 			return true
 	return false
 
-func _generate_occluders() -> void:
+func _generate_occluders_collisions() -> void:
 	# Clear any existing occluders and collision bodies
 	for child in get_children():
 		if child is LightOccluder2D:
@@ -197,8 +233,7 @@ func _create_wall(x, y, direction) -> void:
 	occluder.occluder = occluder_polygon
 	add_child(occluder)
 
-
-func _draw() -> void:
+func _draw_terrains() -> void:
 	if map_drawn:
 		return
 	else:
@@ -260,19 +295,45 @@ func _spawn_random_items(level: int) -> void:
 	var item_sceen = preload("res://Items/item.tscn")
 	var item = item_sceen.instantiate()
 
+	var quantity_in_room = {
+		0: 3,
+		1: 3,
+		2: 2
+	}
+	
+	var quantity_in_corridor = {
+		0: 2,
+		1: 2,
+		2: 1,
+		3: 0
+	}
+
+	var room_quantity = quantity_in_room[level]
 	if room_center.size() > 0:
-		var random_room_center = room_center[randi() % room_center.size()]
-		var item_position = random_room_center * SCALE_FACTOR
-		item_position.x += randi() % 16
-		item_position.y += randi() % 16
-		
-		item.global_position = item_position
-		item.z_index = 9
-		
-		add_child(item)
-		print("Item spawned at:", item_position)
+		for i in range(room_quantity):
+			_spawn_item(true)
+			
+	var corridor_quantity = quantity_in_corridor[level]
+	for i in range(corridor_quantity):
+		_spawn_item(false)
 
+func _spawn_item(in_room: bool) -> void:
+	var item_scene = preload("res://Items/item.tscn")
+	var item = item_scene.instantiate()
+	var random_tile
 
+	if in_room:
+		random_tile = room_data.keys()[randi() % room_data.size()]
+	else:
+		random_tile = corridor_data.keys()[randi() % corridor_data.size()]
+
+	var item_position = random_tile * SCALE_FACTOR
+	item.global_position = item_position
+	item.scale = Vector2(0.5, 0.5)
+	item.add_to_group("items")
+	add_child(item)
+
+	
 func _spawn_player() -> void:
 	if room_center.size() > 0:
 		# Choose a random room center
@@ -288,3 +349,7 @@ func _spawn_player() -> void:
 
 		_spawn_random_tunnel(true)
 		_spawn_random_items(0)
+
+func _on_player_collect_item() -> void:
+	print("Item collected by player")
+	pass # Replace with function body.
