@@ -36,3 +36,8 @@ func _on_flashtimer_timeout() -> void:
 		flash_counter = 0
 		shader.set_shader_parameter("flash_modifier", 0);
 		timer.stop()
+
+
+func _on_area_2d_area_entered(area: Area2D) -> void:
+	print("Player colleting item")
+	pass # Replace with function body.

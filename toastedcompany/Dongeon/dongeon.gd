@@ -33,12 +33,19 @@ func _ready() -> void:
 	
 func _process(delta: float) -> void:
 	_manage_input()
-	_check_item_collection()
+	#_check_item_collection()
+
+func _on_area_2d_area_entered(area: Area2D) -> void:
+	if area.is_in_group("items"):
+		print("Item found!")
+		area.queue_free()
+		emit_signal("player_collect_item")
 
 func _check_item_collection() -> void:
 	# Get all items in the "items" group and check if the player is overlapping with any of them
 	if not get_tree():
 		return
+		
 	var items = get_tree().get_nodes_in_group("items")
 	if items.size() == 0:
 		return
@@ -48,12 +55,7 @@ func _check_item_collection() -> void:
 		var player_area = $Player.get_node("Area2D")
 		var item_area = item.get_node("Area2D")
 
-		# Ensure both player and item have Area2D components
-		if player_area == null or item_area == null:
-			print("Missing Area2D on player or item!")
-			continue
-
-		# Check for overlap using get_overlapping_bodies (it returns an array of bodies)
+		# Check for overlap
 		var player_overlapping = player_area.get_overlapping_areas()
 		#print(player_overlapping)
 		if player_area.has_overlapping_areas():
@@ -120,13 +122,12 @@ func _generate_data() -> void:
 func _get_random_room(rng: RandomNumberGenerator) -> Rect2:
 	var width = rng.randi_range(rooms_size.x, rooms_size.y)
 	var height = rng.randi_range(rooms_size.x, rooms_size.y)
-	# Ensure the room's top-left position keeps the room within level_size
+
 	var x = rng.randi_range(0, level_size.x - width)
 	var y = rng.randi_range(0, level_size.y - height)
 	return Rect2(Vector2(x, y), Vector2(width, height))
 
 func _add_room(room: Rect2) -> void:
-	# Use global positions for adding room tiles
 	for x in range(room.position.x, room.end.x):
 		for y in range(room.position.y, room.end.y):
 			room_data[Vector2(x, y)] = true
@@ -165,7 +166,7 @@ func _generate_occluders_collisions() -> void:
 		elif child is StaticBody2D:
 			child.queue_free()
 
-	# Check all tiles and add occluders where there are walls but not on corridors
+	# Check all tiles and add occluders / collision bodies where needed
 	for x in range(0, level_size.x):
 		for y in range(0, level_size.y):
 			var tile = tile_map.get_cell_source_id(Vector2i(x, y))
@@ -174,13 +175,13 @@ func _generate_occluders_collisions() -> void:
 			if tile == -1 or corridor_data.has(Vector2(x, y)):
 				continue
 
-			# Check the surrounding tiles (up, down, left, right) to determine where occluders and walls are needed
+			# Check the surrounding tiles (up, down, left, right)
 			var up = tile_map.get_cell_source_id(Vector2i(x, y - 1))
 			var down = tile_map.get_cell_source_id(Vector2i(x, y + 1))
 			var left = tile_map.get_cell_source_id(Vector2i(x - 1, y))
 			var right = tile_map.get_cell_source_id(Vector2i(x + 1, y))
 
-			# Add occluder and collision bodies
+			# Add occluder and collision bodies if needed
 			if up == -1:
 				_create_wall(x, y, 0) # Wall above
 			if down == -1:
@@ -332,7 +333,7 @@ func _spawn_item(in_room: bool) -> void:
 	var item_position = random_tile * SCALE_FACTOR
 	item.global_position = item_position
 	item.scale = Vector2(0.5, 0.5)
-	item.add_to_group("items")
+	#item.add_to_group("items")
 	add_child(item)
 
 	

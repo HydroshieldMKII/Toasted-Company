@@ -22,6 +22,11 @@ func _process(delta: float) -> void:
 	pass
 
 
-func _on_player_entered() -> void:
-	print("Object collected by player")
-	pass # Replace with function body.
+func _on_area_2d_area_entered(area: Area2D) -> void:
+	#Check if item is in contact with player
+	print("Item getting collected")
+	print(area.get_groups())
+	if area.is_in_group("player"):
+		print("Item got collected")
+		#Add item value to player's score
+		queue_free() #Clear item
