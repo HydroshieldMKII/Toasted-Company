@@ -29,45 +29,11 @@ func _ready() -> void:
 		_generate_dongeon_data()
 		_draw_terrains()
 		_generate_occluders_collisions()
+		_spawn_random_items(0)
 		_spawn_player()
 	
 func _process(delta: float) -> void:
 	_manage_input()
-	#_check_item_collection()
-
-func _on_area_2d_area_entered(area: Area2D) -> void:
-	if area.is_in_group("items"):
-		print("Item found!")
-		area.queue_free()
-		emit_signal("player_collect_item")
-
-func _check_item_collection() -> void:
-	# Get all items in the "items" group and check if the player is overlapping with any of them
-	if not get_tree():
-		return
-		
-	var items = get_tree().get_nodes_in_group("items")
-	if items.size() == 0:
-		return
-
-	#print("Checking items")
-	for item in items:
-		var player_area = $Player.get_node("Area2D")
-		var item_area = item.get_node("Area2D")
-
-		# Check for overlap
-		var player_overlapping = player_area.get_overlapping_areas()
-		#print(player_overlapping)
-		if player_area.has_overlapping_areas():
-			print("Item overlapping: ", player_overlapping)
-			
-		for area in player_overlapping:
-			if area.is_in_group("items"):
-				print("Item found!")
-				item.queue_free()
-				emit_signal("player_collect_item")
-				break
-
 
 func _manage_input() -> void:
 	if Input.is_action_just_pressed("f_key"): # toggle fog of war
@@ -330,9 +296,9 @@ func _spawn_item(in_room: bool) -> void:
 	else:
 		random_tile = corridor_data.keys()[randi() % corridor_data.size()]
 
-	var item_position = random_tile * SCALE_FACTOR
-	item.global_position = item_position
+	item.global_position = random_tile * SCALE_FACTOR
 	item.scale = Vector2(0.5, 0.5)
+	item.connect("item_collected", Callable(self, "_on_player_collect_item"))
 	#item.add_to_group("items")
 	add_child(item)
 
@@ -351,8 +317,8 @@ func _spawn_player() -> void:
 		print("Player spawn pos: ", player_position)
 
 		_spawn_random_tunnel(true)
-		_spawn_random_items(0)
 
-func _on_player_collect_item() -> void:
-	print("Item collected by player")
-	pass # Replace with function body.
+func _on_player_collect_item(item_name: String, value: int) -> void:
+	print("Player collected item: ", item_name, " with value: ", value)
+	# emit_signal("player_collect_item", item_name, value)
+	# _spawn_random_items(1)

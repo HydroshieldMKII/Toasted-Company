@@ -193,14 +193,13 @@ script = ExtResource("4_j5ccd")
 player = NodePath("../..")
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
-position = Vector2(1.00001, -1.00001)
 color = Color(0.720467, 0.720468, 0.720467, 1)
 shadow_enabled = true
 shadow_color = Color(0, 0, 0, 0.909804)
 shadow_filter = 2
 shadow_filter_smooth = 2.0
 texture = ExtResource("2_64dd5")
-texture_scale = 8.0
+texture_scale = 12.0
 
 [node name="FlashTimer" type="Timer" parent="."]
 one_shot = true
@@ -211,34 +210,5 @@ offset_left = -45.0
 offset_top = -84.0
 offset_right = 44.0
 offset_bottom = -57.0
-
-[node name="Hotbar" type="CanvasLayer" parent="."]
-
-[node name="PanelContainer" type="PanelContainer" parent="Hotbar"]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -127.0
-offset_top = -220.0
-offset_right = 133.0
-offset_bottom = -92.0
-grow_horizontal = 2
-grow_vertical = 0
-
-[node name="MarginContainer" type="MarginContainer" parent="Hotbar/PanelContainer"]
-layout_mode = 2
-
-[node name="GridContainer" type="GridContainer" parent="Hotbar/PanelContainer/MarginContainer"]
-layout_mode = 2
-columns = 2
-
-[node name="TextureRect" type="TextureRect" parent="Hotbar/PanelContainer/MarginContainer/GridContainer"]
-layout_mode = 2
-stretch_mode = 3
-
-[node name="TextureRect2" type="TextureRect" parent="Hotbar/PanelContainer/MarginContainer/GridContainer"]
-layout_mode = 2
 
 [connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]

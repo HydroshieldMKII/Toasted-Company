@@ -11,6 +11,9 @@ func manage_input() -> Vector2:
 	return dir
 
 func update(delta: float) -> void:
+	if player.is_dead:
+		return
+		
 	if not anim_player:
 		anim_player = player.get_animation_player()
 	
@@ -28,6 +31,9 @@ func update(delta: float) -> void:
 	player.direction = dir
 
 func physics_update(delta: float) -> void:
+	if player.is_dead:
+		player.velocity = Vector2.ZERO
+		return
 	if (player.velocity.length() > 0):
 		if (player.velocity.x > 0 or player.velocity.x < 0):
 			anim_player.play("walk_side")

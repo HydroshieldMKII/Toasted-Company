@@ -1,13 +1,18 @@
 extends GenericCharacter
 class_name Player
 
-@onready var timer : Timer = $FlashTimer
-const NB_FLASH : int = 16
-var flash_counter : int
-var flash_value : int = 0
+@onready var timer: Timer = $FlashTimer
+const NB_FLASH: int = 16
+var flash_counter: int
+var flash_value: int = 0
 var timer_timout_executed = true
 
+var is_dead = false
+var health = 100
+@onready var healthbar = $Healthbar
+
 func _ready() -> void:
+	healthbar.value = 100
 	anim_player = $AnimationPlayer
 	sprite = $Sprite
 	shader = sprite.material as ShaderMaterial
@@ -23,6 +28,8 @@ func _physics_process(delta: float) -> void:
 	if timer.timeout and not timer_timout_executed:
 		_on_flashtimer_timeout()
 		
+	check_health()
+		
 
 func _on_flashtimer_timeout() -> void:
 	shader.set_shader_parameter("flash_modifier", flash_value * 0.5);
@@ -32,12 +39,25 @@ func _on_flashtimer_timeout() -> void:
 		flash_counter += 1
 	else:
 		timer_timout_executed = true
+		healthbar.value -= 20
 		
 		flash_counter = 0
 		shader.set_shader_parameter("flash_modifier", 0);
 		timer.stop()
+		
+func check_health():
+	health = healthbar.value
+	
+	if health <= 0 and not is_dead:
+		print("Player died")
+		is_dead = true
+		healthbar.value = 0
+		anim_player.play("die")
 
-
-func _on_area_2d_area_entered(area: Area2D) -> void:
-	print("Player colleting item")
-	pass # Replace with function body.
+	#Update health color
+	if health <= 30:
+		healthbar.modulate = Color(1, 0, 0)
+	elif health <= 60:
+		healthbar.modulate = Color(1, 1, 0)
+	else:
+		healthbar.modulate = Color(0, 1, 0)
