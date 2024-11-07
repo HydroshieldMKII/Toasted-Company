@@ -33,9 +33,9 @@ func _on_area_2d_area_entered(area: Area2D) -> void:
 		var player = area.get_parent()
 
 		#Check if player have more then 2 items (2 textures in hotbar)
-		var hotbar = player.get_node("Hotbar")
-		var item1 = hotbar.get_node("PanelContainer/MarginContainer/GridContainer/TextureRect")
-		var item2 = hotbar.get_node("PanelContainer/MarginContainer/GridContainer/TextureRect2")
+		var hotbar = player.get_node("HUD")
+		var item1 = hotbar.get_node("PanelContainer/MarginContainer/GridContainer/Item1")
+		var item2 = hotbar.get_node("PanelContainer/MarginContainer/GridContainer/Item2")
 
 		if item1.texture != null and item2.texture != null:
 			print("Hotbar is full, can't collect more items")

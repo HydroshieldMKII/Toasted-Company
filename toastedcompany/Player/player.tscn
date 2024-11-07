@@ -9,7 +9,7 @@
 [ext_resource type="Script" path="res://StateMachine/player_idle.gd" id="5_371nc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_aklre"]
-size = Vector2(81, 98)
+size = Vector2(73, 93)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tmtka"]
 size = Vector2(72, 88)
@@ -154,7 +154,7 @@ height = 0.82
 max_distance = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-0.5, -4)
+position = Vector2(-0.5, -6.5)
 shape = SubResource("RectangleShape2D_aklre")
 
 [node name="Area2D" type="Area2D" parent="." groups=["player"]]
@@ -212,9 +212,9 @@ offset_top = -84.0
 offset_right = 44.0
 offset_bottom = -57.0
 
-[node name="Hotbar" type="CanvasLayer" parent="."]
+[node name="HUD" type="CanvasLayer" parent="."]
 
-[node name="PanelContainer" type="PanelContainer" parent="Hotbar"]
+[node name="PanelContainer" type="PanelContainer" parent="HUD"]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
@@ -227,18 +227,70 @@ offset_bottom = -92.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="Hotbar/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="HUD/PanelContainer"]
 layout_mode = 2
 
-[node name="GridContainer" type="GridContainer" parent="Hotbar/PanelContainer/MarginContainer"]
+[node name="GridContainer" type="GridContainer" parent="HUD/PanelContainer/MarginContainer"]
 layout_mode = 2
 columns = 2
 
-[node name="TextureRect" type="TextureRect" parent="Hotbar/PanelContainer/MarginContainer/GridContainer"]
+[node name="Item1" type="TextureRect" parent="HUD/PanelContainer/MarginContainer/GridContainer"]
 layout_mode = 2
 stretch_mode = 3
 
-[node name="TextureRect2" type="TextureRect" parent="Hotbar/PanelContainer/MarginContainer/GridContainer"]
+[node name="Item2" type="TextureRect" parent="HUD/PanelContainer/MarginContainer/GridContainer"]
 layout_mode = 2
+
+[node name="Score" type="Label" parent="HUD"]
+offset_left = 100.0
+offset_top = 100.0
+offset_right = 238.0
+offset_bottom = 123.0
+scale = Vector2(2, 2)
+text = "Missing points: 96"
+
+[node name="InventoryWarning" type="Label" parent="HUD"]
+visible = false
+modulate = Color(1, 1, 0.0980392, 1)
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -186.0
+offset_top = -40.0
+offset_right = 186.0
+offset_bottom = -17.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Inventory full! Drop loots at the trap to continue"
+
+[node name="ItemScore1" type="Label" parent="HUD"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -85.0
+offset_top = -117.0
+offset_right = -57.0
+offset_bottom = -94.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="ItemScore2" type="Label" parent="HUD"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 59.0
+offset_top = -117.0
+offset_right = 88.0
+offset_bottom = -94.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "
+"
 
 [connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]

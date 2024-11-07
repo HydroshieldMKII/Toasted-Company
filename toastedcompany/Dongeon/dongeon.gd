@@ -20,7 +20,13 @@ const SCALED_TILE_SIZE := TILE_SIZE * SCALE_FACTOR
 
 var map_drawn = false
 
-signal tunnel_entered
+var points_per_level = {
+	0: 100,
+	1: 150,
+	2: 250
+}
+
+var points_accumulated = 0
 
 func _ready() -> void:
 	if not map_drawn:
@@ -29,6 +35,13 @@ func _ready() -> void:
 		_generate_occluders_collisions()
 		_spawn_random_items(0)
 		_spawn_player()
+
+		var player = $Player
+		var hud = player.get_node("HUD")
+		var score = points_per_level[0]
+
+		var score_label = hud.get_node("Score")
+		score_label.text = "Missing points: " + str(score)
 	
 func _process(delta: float) -> void:
 	_manage_input()
@@ -254,12 +267,12 @@ func _spawn_random_tunnel(closed: bool) -> void:
 					var tile_x = int((top_left_x + i * TILE_SIZE) / TILE_SIZE)
 					var tile_y = int((top_left_y + j * TILE_SIZE) / TILE_SIZE)
 					var tile_coord = Vector2i(tile_x, tile_y)
-					print("Tile coord:", tile_coord)
+
 					# Set atlas coordinates for the tile (example coordinates used here)
 					var atlas_coord = Vector2i(30 + i, 12 + j)
 					tunnel_tile_map.set_cell(tile_coord, 0, atlas_coord)
 		else:
-			print("Tunnel opened, state:", closed)
+			print("Tunnel created, state:", closed)
 
 
 		# Add Area2D for detecting player entry into the tunnel (random room center)
@@ -342,18 +355,54 @@ func _spawn_player() -> void:
 func _on_player_collect_item(item_name: String, value: int) -> void:
 	print("Player collected item: ", item_name, " with value: ", value)
 
-	# Hotbar (canvas layer) > PanelContainer > MarginContainer > GridContainer > TextureRect (item icon)
-	var hotbar = $Player.get_node("Hotbar")
-	var item1 = hotbar.get_node("PanelContainer/MarginContainer/GridContainer/TextureRect")
-	var item2 = hotbar.get_node("PanelContainer/MarginContainer/GridContainer/TextureRect2")
+	# hud (canvas layer) > PanelContainer > MarginContainer > GridContainer > TextureRect (item icon)
+	var hud = $Player.get_node("HUD")
+	var item1 = hud.get_node("PanelContainer/MarginContainer/GridContainer/Item1")
+	var item2 = hud.get_node("PanelContainer/MarginContainer/GridContainer/Item2")
+
 
 	if item1.texture == null:
 		item1.texture = load("res://Assests/Items/" + item_name + ".png")
 		item1.modulate = Color(1, 1, 1, 1)
+		hud.get_node("ItemScore1").text = str(value)
 	else:
 		item2.texture = load("res://Assests/Items/" + item_name + ".png")
 		item2.modulate = Color(1, 1, 1, 1)
+		hud.get_node("ItemScore2").text = str(value)
+
+		var inventoryWarning = hud.get_node("InventoryWarning")
+		inventoryWarning.visible = true
 
 func _on_tunnel_entered(area: Area2D) -> void:
 	if area.is_in_group("player"):
 		print("Player entered tunnel")
+
+		var hud = $Player.get_node("HUD")
+		var inventoryWarning = hud.get_node("InventoryWarning")
+		inventoryWarning.visible = false
+
+		var item1 = hud.get_node("PanelContainer/MarginContainer/GridContainer/Item1")
+		var item2 = hud.get_node("PanelContainer/MarginContainer/GridContainer/Item2")
+		var item1_value = 0
+		var item2_value = 0
+
+		if hud.get_node("ItemScore1").text != "":
+			item1_value = int(hud.get_node("ItemScore1").text)
+		if hud.get_node("ItemScore2").text != "":
+			item2_value = int(hud.get_node("ItemScore2").text)
+
+		points_accumulated += (item1_value + item2_value)
+		var score = points_per_level[0] - points_accumulated
+
+		var score_label = hud.get_node("Score")
+
+		if score <= 0:
+			score = 0
+			print("Level completed!")
+			score_label.text = "Missing points: " + str(score)
+
+		item1.texture = null
+		item2.texture = null
+		hud.get_node("ItemScore1").text = ""
+		hud.get_node("ItemScore2").text = ""
+		score_label.text = "Missing points: " + str(score)
