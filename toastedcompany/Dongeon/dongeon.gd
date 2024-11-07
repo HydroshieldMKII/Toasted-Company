@@ -22,9 +22,7 @@ const SCALED_TILE_SIZE := TILE_SIZE * SCALE_FACTOR
 var map_drawn = false
 
 # Generation Config
-@export var level_size := Vector2(1000, 750) # Size in pixels
 @export var rooms_size := Vector2(100, 140) # Size in pixels
-@export var rooms_max := 15
 @export var corridor_width := 16
 
 # Level config
@@ -38,14 +36,31 @@ var item_quantity_room = {
 var item_quantity_corridor = {
 	0: 2,
 	1: 2,
-	2: 1,
-	3: 0
+	2: 1
 }
 
 var points_per_level = {
 	0: 100,
 	1: 250,
 	2: 450
+}
+
+var dongeon_size_per_level = {
+	0: Vector2(1000, 750),
+	1: Vector2(1500, 1000),
+	2: Vector2(2000, 1500)
+}
+
+var rooms_max_per_level = {
+	0: 15,
+	1: 20,
+	2: 25
+}
+
+var corridor_width_per_level = {
+	0: 16,
+	1: 16,
+	2: 16
 }
 
 var points_accumulated = 0
@@ -112,7 +127,7 @@ func _generate_data() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 
-	for r in range(rooms_max):
+	for r in range(rooms_max_per_level[current_level]):
 		var room = _get_random_room(rng)
 		if _intersects(rooms, room):
 			continue
@@ -128,8 +143,8 @@ func _get_random_room(rng: RandomNumberGenerator) -> Rect2:
 	var width = rng.randi_range(rooms_size.x, rooms_size.y)
 	var height = rng.randi_range(rooms_size.x, rooms_size.y)
 
-	var x = rng.randi_range(0, level_size.x - width)
-	var y = rng.randi_range(0, level_size.y - height)
+	var x = rng.randi_range(0, dongeon_size_per_level[current_level].x - width)
+	var y = rng.randi_range(0, dongeon_size_per_level[current_level].y - height)
 	return Rect2(Vector2(x, y), Vector2(width, height))
 
 func _add_room(room: Rect2) -> void:
@@ -172,8 +187,8 @@ func _generate_occluders_collisions() -> void:
 			child.queue_free()
 
 	# Check all tiles and add occluders / collision bodies where needed
-	for x in range(0, level_size.x):
-		for y in range(0, level_size.y):
+	for x in range(0, dongeon_size_per_level[current_level].x):
+		for y in range(0, dongeon_size_per_level[current_level].y):
 			var tile = tile_map.get_cell_source_id(Vector2i(x, y))
 
 			# Skip if no tile exists or if it's part of a corridor
@@ -246,8 +261,6 @@ func _draw_terrains() -> void:
 		return
 	else:
 		map_drawn = true
-		# Clear the tile map
-		tile_map.clear()
 	print("Drawing dungeon...")
 
 	# Tiles for corridors
@@ -393,6 +406,21 @@ func _on_player_collect_item(item_name: String, value: int) -> void:
 		var inventoryWarning = hud.get_node("InventoryWarning")
 		inventoryWarning.visible = true
 
+func _go_next_level() -> void:
+	current_level += 1
+	points_accumulated = 0
+	map_drawn = false
+
+	tunnel_tile_map.queue_free()
+	tile_map.clear()
+
+	_generate_dongeon_data()
+	_draw_terrains()
+	_generate_occluders_collisions()
+	_spawn_random_items(current_level)
+	_spawn_player()
+	_update_uhd()
+
 func _on_tunnel_entered(area: Area2D) -> void:
 	if area.is_in_group("player"):
 		print("Player entered tunnel")
@@ -408,38 +436,17 @@ func _on_tunnel_entered(area: Area2D) -> void:
 		if hud.get_node("ItemScore2").text != "":
 			item2_value = int(hud.get_node("ItemScore2").text)
 
-		print("Item1 value: ", item1_value)
-		print("Item2 value: ", item2_value)
 		points_accumulated += (item1_value + item2_value)
-		var score = points_per_level[current_level] - points_accumulated
 
-		var score_label = hud.get_node("Score")
-
-		if score <= 0:
+		if points_per_level[current_level] - points_accumulated <= 0:
 			print("Level completed!")
-			score = 0
-			current_level += 1
-			points_accumulated = 0
-
-			print("Current level: ", current_level)
-			print("Next target: ", str(points_per_level[current_level]))
-			score_label.text = "Missing points: " + str(points_per_level[current_level])
-
-			#Generate new level
-			tunnel_tile_map.queue_free()
-			_generate_dongeon_data()
-			map_drawn = false
-			_draw_terrains()
-			_generate_occluders_collisions()
-			_spawn_random_items(current_level)
-			_spawn_player()
+			_go_next_level()
 
 		else:
 			# If no more items in the map, spawn new ones
 			var items = get_tree().get_nodes_in_group("item")
 			if items.size() == 0:
-				_spawn_random_items(current_level)
-			score_label.text = "Missing points: " + str(score)
+				_spawn_item(true)
 
 		_update_uhd()
 
