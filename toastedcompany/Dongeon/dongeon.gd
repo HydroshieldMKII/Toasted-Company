@@ -1,14 +1,15 @@
 extends Node2D
 
-@export var level_size := Vector2(1000, 750)
-@export var rooms_size := Vector2(100, 140)
-@export var rooms_max := 15
-@export var corridor_width := 16
 @export var player_scene := preload("res://Player/player.tscn") # Preload the player scene
+var player: Player = null
+
 @onready var fog: CanvasModulate = $Fog
 
+# TileMapLayer
 @onready var tile_map := $Level
+var tunnel_tile_map: TileMapLayer = null
 
+# Generation data
 var room_data = {}
 var room_center = []
 var corridor_data = {}
@@ -20,10 +21,31 @@ const SCALED_TILE_SIZE := TILE_SIZE * SCALE_FACTOR
 
 var map_drawn = false
 
+# Generation Config
+@export var level_size := Vector2(1000, 750) # Size in pixels
+@export var rooms_size := Vector2(100, 140) # Size in pixels
+@export var rooms_max := 15
+@export var corridor_width := 16
+
+# Level config
+var current_level = 0
+var item_quantity_room = {
+	0: 3,
+	1: 3,
+	2: 2
+}
+
+var item_quantity_corridor = {
+	0: 2,
+	1: 2,
+	2: 1,
+	3: 0
+}
+
 var points_per_level = {
 	0: 100,
-	1: 150,
-	2: 250
+	1: 250,
+	2: 450
 }
 
 var points_accumulated = 0
@@ -35,56 +57,55 @@ func _ready() -> void:
 		_generate_occluders_collisions()
 		_spawn_random_items(0)
 		_spawn_player()
-
-		var player = $Player
-		var hud = player.get_node("HUD")
-		var score = points_per_level[0]
-
-		var score_label = hud.get_node("Score")
-		score_label.text = "Missing points: " + str(score)
+		_update_uhd()
 	
 func _process(delta: float) -> void:
 	_manage_input()
-	#_check_if_player_on_tunnel()
 
 func _manage_input() -> void:
+	if player == null:
+		return
+
 	if Input.is_action_just_pressed("f_key"): # toggle fog of war
 		$Fog.visible = not $Fog.visible
 
 	if Input.is_action_just_pressed("minus"): # zoom out
-		$Player.get_node("Camera2D").zoom /= 1.3
+		player.get_node("Camera2D").zoom /= 1.3
 
 	if Input.is_action_just_pressed("equal"): # zoom in
-		$Player.get_node("Camera2D").zoom *= 1.3
+		player.get_node("Camera2D").zoom *= 1.3
 
 	if Input.is_action_just_pressed("r"): # reset the game
 		get_tree().reload_current_scene()
 
 	if Input.is_action_just_pressed("l_bracket"): # decrease light radius
-		$Player.get_node("PointLight2D").texture_scale -= 1
+		player.get_node("PointLight2D").texture_scale -= 1
 		
 	if Input.is_action_just_pressed("r_bracket"): # increase light radiu
-		$Player.get_node("PointLight2D").texture_scale += 1
+		player.get_node("PointLight2D").texture_scale += 1
 
 	if Input.is_action_just_pressed("semicol"): # decrease player speed
-		$Player.get_node("StateMachine/Walk").move_speed -= 25
+		player.get_node("StateMachine/Walk").move_speed -= 25
 
 	if Input.is_action_just_pressed("quote"): # increase player speed
-		$Player.get_node("StateMachine/Walk").move_speed += 25
+		player.get_node("StateMachine/Walk").move_speed += 25
 		
 	if Input.is_action_just_pressed("g"): # toggle player collision
-		$Player.get_node("CollisionShape2D").disabled = not $Player.get_node("CollisionShape2D").disabled
+		player.get_node("CollisionShape2D").disabled = not player.get_node("CollisionShape2D").disabled
 
-func _check_if_player_on_tunnel() -> void:
-	var player_position = $Player.global_position
-	var standing_tile = tile_map.get_cell_tile_data(Vector2i(int(player_position.x / SCALED_TILE_SIZE), int(player_position.y / SCALED_TILE_SIZE)))
+func _update_uhd() -> void:
+	var hud = player.get_node("HUD")
+	var score_label = hud.get_node("Score")
+	score_label.text = "Missing points: " + str(points_per_level[current_level] - points_accumulated)
 
-	print("Player standing on tile: ", standing_tile)
-	
+	var inventoryWarning = hud.get_node("InventoryWarning")
+	inventoryWarning.visible = false
+
 func _generate_dongeon_data() -> void:
 	room_data.clear()
 	corridor_data.clear()
 	rooms.clear()
+	room_center.clear()
 	_generate_data()
 
 func _generate_data() -> void:
@@ -207,24 +228,26 @@ func _create_wall(x, y, direction) -> void:
 		points.push_back(Vector2(bottom_right.x, top_left.y + SCALED_TILE_SIZE))
 
 	polygon_shape.polygon = points
-	body.add_child(polygon_shape)
+	body.call_deferred("add_child", polygon_shape)
 
 	body.collision_layer = 1 # Wall collision layer
 	body.collision_mask = 1 # Player collision layer
 
-	add_child(body)
+	call_deferred("add_child", body)
 
 	var occluder = LightOccluder2D.new()
 	var occluder_polygon = OccluderPolygon2D.new()
 	occluder_polygon.polygon = points
 	occluder.occluder = occluder_polygon
-	add_child(occluder)
+	call_deferred("add_child", occluder)
 
 func _draw_terrains() -> void:
 	if map_drawn:
 		return
 	else:
 		map_drawn = true
+		# Clear the tile map
+		tile_map.clear()
 	print("Drawing dungeon...")
 
 	# Tiles for corridors
@@ -255,8 +278,8 @@ func _spawn_random_tunnel(closed: bool) -> void:
 		var top_left_x = random_room_center.x - (3 * TILE_SIZE * SCALE_FACTOR) / 6
 		var top_left_y = random_room_center.y - (3 * TILE_SIZE * SCALE_FACTOR) / 6
 
+		tunnel_tile_map = TileMapLayer.new()
 		# Create a new TileMap layer for the tunnel (closed or open)
-		var tunnel_tile_map = TileMapLayer.new()
 		tunnel_tile_map.tile_set = tile_map.tile_set
 		tunnel_tile_map.scale = Vector2(SCALE_FACTOR, SCALE_FACTOR)
 
@@ -278,44 +301,36 @@ func _spawn_random_tunnel(closed: bool) -> void:
 		# Add Area2D for detecting player entry into the tunnel (random room center)
 		var area = Area2D.new()
 		var circle_shape = CircleShape2D.new()
-		circle_shape.radius = TILE_SIZE * 3.5
+		circle_shape.radius = TILE_SIZE * 2.5
 		
 		var collision_shape = CollisionShape2D.new()
 		collision_shape.shape = circle_shape
-		area.add_child(collision_shape)
+		area.call_deferred("add_child", collision_shape)
 		area.position = random_room_center
 		print("Area position:", area.position)
 
 		area.connect("area_entered", Callable(self, "_on_tunnel_entered"))
-		tunnel_tile_map.add_child(area)
+		tunnel_tile_map.call_deferred("add_child", area)
 
-		add_child(tunnel_tile_map)
+		call_deferred("add_child", tunnel_tile_map)
 		print("Tunnel spawned at room center:", random_room_center, ", closed state:", closed)
 	
 func _spawn_random_items(level: int) -> void:
+	# Clear any existing items
+	var items = get_tree().get_nodes_in_group("item")
+	for item in items:
+		item.queue_free()
+	
 	# Spawn items in random rooms
 	var item_sceen = preload("res://Items/item.tscn")
 	var item = item_sceen.instantiate()
 
-	var quantity_in_room = {
-		0: 3,
-		1: 3,
-		2: 2
-	}
-	
-	var quantity_in_corridor = {
-		0: 2,
-		1: 2,
-		2: 1,
-		3: 0
-	}
-
-	var room_quantity = quantity_in_room[level]
+	var room_quantity = item_quantity_room[level]
 	if room_center.size() > 0:
 		for i in range(room_quantity):
 			_spawn_item(true)
 			
-	var corridor_quantity = quantity_in_corridor[level]
+	var corridor_quantity = item_quantity_corridor[level]
 	for i in range(corridor_quantity):
 		_spawn_item(false)
 
@@ -332,31 +347,36 @@ func _spawn_item(in_room: bool) -> void:
 	item.global_position = random_tile * SCALE_FACTOR
 	item.scale = Vector2(0.5, 0.5)
 	item.connect("item_collected", Callable(self, "_on_player_collect_item"))
-	add_child(item)
+	item.add_to_group("item")
+	call_deferred("add_child", item)
 
 	
 func _spawn_player() -> void:
 	if room_center.size() > 0:
+		# Destroy any existing player instance
+		if player != null:
+			player.queue_free()
+
 		# Choose a random room center
 		var random_room_center = room_center[randi() % room_center.size()]
 		
 		# Calculate the player position and instantiate the player
 		var player_position = random_room_center * SCALE_FACTOR
-		var player = player_scene.instantiate()
+		player = player_scene.instantiate()
 		player.global_position = player_position
-		add_child(player)
+		call_deferred("add_child", player)
 		
 		print("Player spawn pos: ", player_position)
 
 		_spawn_random_tunnel(true)
 
-#Singal callback
+#Signal callback
 
 func _on_player_collect_item(item_name: String, value: int) -> void:
 	print("Player collected item: ", item_name, " with value: ", value)
 
 	# hud (canvas layer) > PanelContainer > MarginContainer > GridContainer > TextureRect (item icon)
-	var hud = $Player.get_node("HUD")
+	var hud = player.get_node("HUD")
 	var item1 = hud.get_node("PanelContainer/MarginContainer/GridContainer/Item1")
 	var item2 = hud.get_node("PanelContainer/MarginContainer/GridContainer/Item2")
 
@@ -377,10 +397,7 @@ func _on_tunnel_entered(area: Area2D) -> void:
 	if area.is_in_group("player"):
 		print("Player entered tunnel")
 
-		var hud = $Player.get_node("HUD")
-		var inventoryWarning = hud.get_node("InventoryWarning")
-		inventoryWarning.visible = false
-
+		var hud = player.get_node("HUD")
 		var item1 = hud.get_node("PanelContainer/MarginContainer/GridContainer/Item1")
 		var item2 = hud.get_node("PanelContainer/MarginContainer/GridContainer/Item2")
 		var item1_value = 0
@@ -391,18 +408,42 @@ func _on_tunnel_entered(area: Area2D) -> void:
 		if hud.get_node("ItemScore2").text != "":
 			item2_value = int(hud.get_node("ItemScore2").text)
 
+		print("Item1 value: ", item1_value)
+		print("Item2 value: ", item2_value)
 		points_accumulated += (item1_value + item2_value)
-		var score = points_per_level[0] - points_accumulated
+		var score = points_per_level[current_level] - points_accumulated
 
 		var score_label = hud.get_node("Score")
 
 		if score <= 0:
-			score = 0
 			print("Level completed!")
+			score = 0
+			current_level += 1
+			points_accumulated = 0
+
+			print("Current level: ", current_level)
+			print("Next target: ", str(points_per_level[current_level]))
+			score_label.text = "Missing points: " + str(points_per_level[current_level])
+
+			#Generate new level
+			tunnel_tile_map.queue_free()
+			_generate_dongeon_data()
+			map_drawn = false
+			_draw_terrains()
+			_generate_occluders_collisions()
+			_spawn_random_items(current_level)
+			_spawn_player()
+
+		else:
+			# If no more items in the map, spawn new ones
+			var items = get_tree().get_nodes_in_group("item")
+			if items.size() == 0:
+				_spawn_random_items(current_level)
 			score_label.text = "Missing points: " + str(score)
+
+		_update_uhd()
 
 		item1.texture = null
 		item2.texture = null
 		hud.get_node("ItemScore1").text = ""
 		hud.get_node("ItemScore2").text = ""
-		score_label.text = "Missing points: " + str(score)

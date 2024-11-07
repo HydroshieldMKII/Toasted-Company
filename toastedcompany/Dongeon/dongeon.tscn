@@ -1337,4 +1337,5 @@ scale = Vector2(5, 5)
 tile_set = SubResource("TileSet_hhawu")
 
 [node name="Fog" type="CanvasModulate" parent="."]
+visible = false
 color = Color(0, 0, 0, 1)

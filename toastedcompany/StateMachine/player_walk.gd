@@ -4,7 +4,7 @@ class_name PlayerWalk
 @export var player: Player
 var anim_player: AnimationPlayer
 
-@export var move_speed := 425.0
+@export var move_speed := 725.0 #425.0
 
 func manage_input() -> Vector2:
 	var dir: Vector2 = Input.get_vector("left", "right", "up", "down").normalized()

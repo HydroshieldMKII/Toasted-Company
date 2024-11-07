@@ -247,7 +247,6 @@ offset_top = 100.0
 offset_right = 238.0
 offset_bottom = 123.0
 scale = Vector2(2, 2)
-text = "Missing points: 96"
 
 [node name="InventoryWarning" type="Label" parent="HUD"]
 visible = false
