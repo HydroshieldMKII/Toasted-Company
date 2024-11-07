@@ -30,37 +30,79 @@ var current_level = 0
 var item_quantity_room = {
 	0: 3,
 	1: 3,
-	2: 2
+	2: 5,
+	3: 7,
+	4: 9,
+	5: 11,
+	6: 11,
+	7: 12,
+	8: 13,
+	9: 14
 }
 
 var item_quantity_corridor = {
-	0: 2,
+	0: 1,
 	1: 2,
-	2: 1
+	2: 2,
+	3: 3,
+	4: 4,
+	5: 5,
+	6: 6,
+	7: 7,
+	8: 8,
+	9: 8
 }
 
 var points_per_level = {
 	0: 100,
-	1: 250,
-	2: 450
+	1: 300,
+	2: 500,
+	3: 700,
+	4: 900,
+	5: 1100,
+	6: 1400,
+	7: 2000,
+	8: 3000,
+	9: 5000
 }
 
 var dongeon_size_per_level = {
 	0: Vector2(1000, 750),
-	1: Vector2(1500, 1000),
-	2: Vector2(2000, 1500)
+	1: Vector2(1200, 900),
+	2: Vector2(1400, 1050),
+	3: Vector2(1600, 1200),
+	4: Vector2(1800, 1350),
+	5: Vector2(2000, 1500),
+	6: Vector2(2200, 1650),
+	7: Vector2(2400, 1800),
+	8: Vector2(2600, 1950),
+	9: Vector2(2800, 2100)
 }
 
 var rooms_max_per_level = {
 	0: 15,
-	1: 20,
-	2: 25
+	1: 17,
+	2: 19,
+	3: 21,
+	4: 23,
+	5: 25,
+	6: 27,
+	7: 29,
+	8: 31,
+	9: 33
 }
 
 var corridor_width_per_level = {
 	0: 16,
 	1: 16,
-	2: 16
+	2: 16,
+	3: 16,
+	4: 16,
+	5: 16,
+	6: 16,
+	7: 16,
+	8: 16,
+	9: 16
 }
 
 var points_accumulated = 0
@@ -107,6 +149,9 @@ func _manage_input() -> void:
 		
 	if Input.is_action_just_pressed("g"): # toggle player collision
 		player.get_node("CollisionShape2D").disabled = not player.get_node("CollisionShape2D").disabled
+		
+	if Input.is_action_just_pressed("."):
+		_go_next_level()
 
 func _update_uhd() -> void:
 	var hud = player.get_node("HUD")
@@ -407,6 +452,11 @@ func _on_player_collect_item(item_name: String, value: int) -> void:
 		inventoryWarning.visible = true
 
 func _go_next_level() -> void:
+	if current_level == 9:
+		print("Game completed!")
+		get_tree().quit()
+		return
+
 	current_level += 1
 	points_accumulated = 0
 	map_drawn = false
