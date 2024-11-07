@@ -20,6 +20,8 @@ const SCALED_TILE_SIZE := TILE_SIZE * SCALE_FACTOR
 
 var map_drawn = false
 
+signal tunnel_entered
+
 func _ready() -> void:
 	if not map_drawn:
 		_generate_dongeon_data()
@@ -30,6 +32,7 @@ func _ready() -> void:
 	
 func _process(delta: float) -> void:
 	_manage_input()
+	#_check_if_player_on_tunnel()
 
 func _manage_input() -> void:
 	if Input.is_action_just_pressed("f_key"): # toggle fog of war
@@ -59,6 +62,12 @@ func _manage_input() -> void:
 	if Input.is_action_just_pressed("g"): # toggle player collision
 		$Player.get_node("CollisionShape2D").disabled = not $Player.get_node("CollisionShape2D").disabled
 
+func _check_if_player_on_tunnel() -> void:
+	var player_position = $Player.global_position
+	var standing_tile = tile_map.get_cell_tile_data(Vector2i(int(player_position.x / SCALED_TILE_SIZE), int(player_position.y / SCALED_TILE_SIZE)))
+
+	print("Player standing on tile: ", standing_tile)
+	
 func _generate_dongeon_data() -> void:
 	room_data.clear()
 	corridor_data.clear()
@@ -245,12 +254,27 @@ func _spawn_random_tunnel(closed: bool) -> void:
 					var tile_x = int((top_left_x + i * TILE_SIZE) / TILE_SIZE)
 					var tile_y = int((top_left_y + j * TILE_SIZE) / TILE_SIZE)
 					var tile_coord = Vector2i(tile_x, tile_y)
-					
+					print("Tile coord:", tile_coord)
 					# Set atlas coordinates for the tile (example coordinates used here)
 					var atlas_coord = Vector2i(30 + i, 12 + j)
 					tunnel_tile_map.set_cell(tile_coord, 0, atlas_coord)
 		else:
 			print("Tunnel opened, state:", closed)
+
+
+		# Add Area2D for detecting player entry into the tunnel (random room center)
+		var area = Area2D.new()
+		var circle_shape = CircleShape2D.new()
+		circle_shape.radius = TILE_SIZE * 3.5
+		
+		var collision_shape = CollisionShape2D.new()
+		collision_shape.shape = circle_shape
+		area.add_child(collision_shape)
+		area.position = random_room_center
+		print("Area position:", area.position)
+
+		area.connect("area_entered", Callable(self, "_on_tunnel_entered"))
+		tunnel_tile_map.add_child(area)
 
 		add_child(tunnel_tile_map)
 		print("Tunnel spawned at room center:", random_room_center, ", closed state:", closed)
@@ -295,7 +319,6 @@ func _spawn_item(in_room: bool) -> void:
 	item.global_position = random_tile * SCALE_FACTOR
 	item.scale = Vector2(0.5, 0.5)
 	item.connect("item_collected", Callable(self, "_on_player_collect_item"))
-	#item.add_to_group("items")
 	add_child(item)
 
 	
@@ -314,6 +337,8 @@ func _spawn_player() -> void:
 
 		_spawn_random_tunnel(true)
 
+#Singal callback
+
 func _on_player_collect_item(item_name: String, value: int) -> void:
 	print("Player collected item: ", item_name, " with value: ", value)
 
@@ -328,3 +353,7 @@ func _on_player_collect_item(item_name: String, value: int) -> void:
 	else:
 		item2.texture = load("res://Assests/Items/" + item_name + ".png")
 		item2.modulate = Color(1, 1, 1, 1)
+
+func _on_tunnel_entered(area: Area2D) -> void:
+	if area.is_in_group("player"):
+		print("Player entered tunnel")
