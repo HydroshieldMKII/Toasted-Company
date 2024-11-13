@@ -1,4 +1,5 @@
 extends Node2D
+class_name Dongeon
 
 @export var player_scene := preload("res://Player/player.tscn") # Preload the player scene
 var player: Player = null
@@ -26,7 +27,6 @@ var map_drawn = false
 @export var corridor_width := 16
 
 # Level config
-var current_level = 0
 var item_quantity_room = {
 	0: 3,
 	1: 3,
@@ -51,6 +51,19 @@ var item_quantity_corridor = {
 	7: 7,
 	8: 8,
 	9: 8
+}
+
+var respawn_quantity = {
+	0: 1,
+	1: 2,
+	2: 4,
+	3: 6,
+	4: 6,
+	5: 7,
+	6: 7,
+	7: 8,
+	8: 10,
+	9: 12
 }
 
 var points_per_level = {
@@ -112,28 +125,36 @@ func _ready() -> void:
 		_generate_dongeon_data()
 		_draw_terrains()
 		_generate_occluders_collisions()
-		_spawn_random_items(0)
+		_spawn_random_items(DongeonGlobal.current_level)
+		_spawn_random_tunnel(true)
 		_spawn_player()
 		_update_uhd()
 	
 func _process(delta: float) -> void:
 	_manage_input()
+	pass
 
 func _manage_input() -> void:
 	if player == null:
 		return
 
-	if Input.is_action_just_pressed("f_key"): # toggle fog of war
-		$Fog.visible = not $Fog.visible
-
 	if Input.is_action_just_pressed("minus"): # zoom out
-		player.get_node("Camera2D").zoom /= 1.3
+		player.get_node("Camera2D").zoom /= 1.5
 
 	if Input.is_action_just_pressed("equal"): # zoom in
-		player.get_node("Camera2D").zoom *= 1.3
+		player.get_node("Camera2D").zoom *= 1.5
 
 	if Input.is_action_just_pressed("r"): # reset the game
 		get_tree().reload_current_scene()
+		DongeonGlobal.current_level = 0
+		
+	if Input.is_action_just_pressed("."):
+		_go_next_level()
+	
+	#return
+	
+	if Input.is_action_just_pressed("f_key"): # toggle fog of war
+		$Fog.visible = not $Fog.visible
 
 	if Input.is_action_just_pressed("l_bracket"): # decrease light radius
 		player.get_node("PointLight2D").texture_scale -= 1
@@ -142,21 +163,18 @@ func _manage_input() -> void:
 		player.get_node("PointLight2D").texture_scale += 1
 
 	if Input.is_action_just_pressed("semicol"): # decrease player speed
-		player.get_node("StateMachine/Walk").move_speed -= 25
+		player.get_node("StateMachine/Walk").move_speed -= 100
 
 	if Input.is_action_just_pressed("quote"): # increase player speed
-		player.get_node("StateMachine/Walk").move_speed += 25
+		player.get_node("StateMachine/Walk").move_speed += 100
 		
 	if Input.is_action_just_pressed("g"): # toggle player collision
 		player.get_node("CollisionShape2D").disabled = not player.get_node("CollisionShape2D").disabled
-		
-	if Input.is_action_just_pressed("."):
-		_go_next_level()
 
 func _update_uhd() -> void:
 	var hud = player.get_node("HUD")
 	var score_label = hud.get_node("Score")
-	score_label.text = "Missing points: " + str(points_per_level[current_level] - points_accumulated)
+	score_label.text = "Missing points: " + str(points_per_level[DongeonGlobal.current_level] - points_accumulated)
 
 	var inventoryWarning = hud.get_node("InventoryWarning")
 	inventoryWarning.visible = false
@@ -172,7 +190,7 @@ func _generate_data() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 
-	for r in range(rooms_max_per_level[current_level]):
+	for r in range(rooms_max_per_level[DongeonGlobal.current_level]):
 		var room = _get_random_room(rng)
 		if _intersects(rooms, room):
 			continue
@@ -188,8 +206,8 @@ func _get_random_room(rng: RandomNumberGenerator) -> Rect2:
 	var width = rng.randi_range(rooms_size.x, rooms_size.y)
 	var height = rng.randi_range(rooms_size.x, rooms_size.y)
 
-	var x = rng.randi_range(0, dongeon_size_per_level[current_level].x - width)
-	var y = rng.randi_range(0, dongeon_size_per_level[current_level].y - height)
+	var x = rng.randi_range(0, dongeon_size_per_level[DongeonGlobal.current_level].x - width)
+	var y = rng.randi_range(0, dongeon_size_per_level[DongeonGlobal.current_level].y - height)
 	return Rect2(Vector2(x, y), Vector2(width, height))
 
 func _add_room(room: Rect2) -> void:
@@ -232,8 +250,8 @@ func _generate_occluders_collisions() -> void:
 			child.queue_free()
 
 	# Check all tiles and add occluders / collision bodies where needed
-	for x in range(0, dongeon_size_per_level[current_level].x):
-		for y in range(0, dongeon_size_per_level[current_level].y):
+	for x in range(0, dongeon_size_per_level[DongeonGlobal.current_level].x):
+		for y in range(0, dongeon_size_per_level[DongeonGlobal.current_level].y):
 			var tile = tile_map.get_cell_source_id(Vector2i(x, y))
 
 			# Skip if no tile exists or if it's part of a corridor
@@ -422,13 +440,11 @@ func _spawn_player() -> void:
 		var player_position = random_room_center * SCALE_FACTOR
 		player = player_scene.instantiate()
 		player.global_position = player_position
+		player.connect("player_respawn", Callable(self, "_spawn_player"))
 		call_deferred("add_child", player)
 		
 		print("Player spawn pos: ", player_position)
-
-		_spawn_random_tunnel(true)
-
-#Signal callback
+		_update_uhd()
 
 func _on_player_collect_item(item_name: String, value: int) -> void:
 	print("Player collected item: ", item_name, " with value: ", value)
@@ -452,12 +468,12 @@ func _on_player_collect_item(item_name: String, value: int) -> void:
 		inventoryWarning.visible = true
 
 func _go_next_level() -> void:
-	if current_level == 9:
+	if DongeonGlobal.current_level == 9:
 		print("Game completed!")
 		get_tree().quit()
 		return
 
-	current_level += 1
+	DongeonGlobal.current_level += 1
 	points_accumulated = 0
 	map_drawn = false
 
@@ -467,7 +483,8 @@ func _go_next_level() -> void:
 	_generate_dongeon_data()
 	_draw_terrains()
 	_generate_occluders_collisions()
-	_spawn_random_items(current_level)
+	_spawn_random_items(DongeonGlobal.current_level)
+	_spawn_random_tunnel(true)
 	_spawn_player()
 	_update_uhd()
 
@@ -488,7 +505,7 @@ func _on_tunnel_entered(area: Area2D) -> void:
 
 		points_accumulated += (item1_value + item2_value)
 
-		if points_per_level[current_level] - points_accumulated <= 0:
+		if points_per_level[DongeonGlobal.current_level] - points_accumulated <= 0:
 			print("Level completed!")
 			_go_next_level()
 

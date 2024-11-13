@@ -5,6 +5,32 @@ var value = 0
 @onready var sprite = $Sprite2D
 @onready var label = $Label
 
+var items_value_min_per_level = {
+	0: 0,
+	1: 5,
+	2: 10,
+	3: 15,
+	4: 20,
+	5: 25,
+	6: 30,
+	7: 35,
+	8: 40,
+	9: 45,
+}
+
+var items_value_max_per_level = {
+	0: 60,
+	1: 80,
+	2: 100,
+	3: 120,
+	4: 140,
+	5: 160,
+	6: 180,
+	7: 200,
+	8: 220,
+	9: 240,
+}
+
 signal item_collected
 
 # Called when the node enters the scene tree for the first time.
@@ -15,8 +41,8 @@ func _ready() -> void:
 	item_name = item_sprite
 	sprite.texture = load("res://Assests/Items/" + item_sprite + ".png")
 
-	#Choose random item value and add label to item
-	value = randi_range(5, 100)
+	#Choose random item value and add label to item depending on dongone level
+	value = randi_range(items_value_min_per_level[DongeonGlobal.current_level], items_value_max_per_level[DongeonGlobal.current_level])
 	label.text = str(value)
 
 

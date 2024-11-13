@@ -4,7 +4,7 @@ class_name PlayerWalk
 @export var player: Player
 var anim_player: AnimationPlayer
 
-@export var move_speed := 725.0 #425.0
+@export var move_speed := 425.0 #725.0 #425.0
 
 func manage_input() -> Vector2:
 	var dir: Vector2 = Input.get_vector("left", "right", "up", "down").normalized()
@@ -22,7 +22,7 @@ func update(delta: float) -> void:
 	if dir.length() > 0:
 		player.velocity = dir * move_speed
 	else:
-		player.velocity = player.velocity.move_toward(Vector2.ZERO, 10)
+		player.velocity = player.velocity.move_toward(Vector2.ZERO, 20)
 	
 	if (player.velocity.length() == 0):
 		#print("Transitionned to idle")
