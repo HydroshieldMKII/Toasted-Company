@@ -26,6 +26,9 @@ var map_drawn = false
 @export var rooms_size := Vector2(100, 140) # Size in pixels
 @export var corridor_width := 16
 
+var max_death_per_level = 3
+var current_nbr_of_death = 0
+
 # Level config
 var item_quantity_room = {
 	0: 3,
@@ -440,7 +443,7 @@ func _spawn_player() -> void:
 		var player_position = random_room_center * SCALE_FACTOR
 		player = player_scene.instantiate()
 		player.global_position = player_position
-		player.connect("player_respawn", Callable(self, "_spawn_player"))
+		player.connect("player_respawn", Callable(self, "_player_death"))
 		call_deferred("add_child", player)
 		
 		print("Player spawn pos: ", player_position)
@@ -521,3 +524,12 @@ func _on_tunnel_entered(area: Area2D) -> void:
 		item2.texture = null
 		hud.get_node("ItemScore1").text = ""
 		hud.get_node("ItemScore2").text = ""
+
+func _player_death() -> void:
+	current_nbr_of_death += 1
+	
+	if current_nbr_of_death >= max_death_per_level:
+		get_tree().reload_current_scene()
+		DongeonGlobal.current_level = 0
+	else:
+		_spawn_player()
