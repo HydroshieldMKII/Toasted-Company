@@ -3,14 +3,15 @@ class_name Dongeon
 
 @export var player_scene := preload("res://Player/player.tscn") # Preload the player scene
 @export var splash_scene := preload("res://SplashScreens/splashscreen.tscn")
+@export var spike_scene = preload("res://Dongeon/Spike/spike.tscn")
 var player: Player = null
 var splash: Splash = null
 
 @onready var fog: CanvasModulate = $Fog
 
 # TileMapLayer
-@onready var tile_map := $Level
 var tunnel_tile_map: TileMapLayer = null
+@onready var tile_map := $Level
 
 # Generation data
 var room_data = {}
@@ -123,6 +124,19 @@ var corridor_width_per_level = {
 	9: 16
 }
 
+var spike_quantity_per_level = {
+	0: 10,
+	1: 2,
+	2: 3,
+	3: 4,
+	4: 5,
+	5: 6,
+	6: 7,
+	7: 8,
+	8: 9,
+	9: 10
+}
+
 var points_accumulated = 0
 
 func _ready() -> void:
@@ -134,6 +148,9 @@ func _ready() -> void:
 		_spawn_random_tunnel(true)
 		_spawn_player()
 		_update_uhd()
+
+		for i in range(spike_quantity_per_level[DongeonGlobal.current_level]):
+			_spawn_spike()
 		#splash = splash_scene.instantiate()
 		#call_deferred("add_child", splash)
 		
@@ -428,10 +445,19 @@ func _spawn_item(in_room: bool) -> void:
 		random_tile = corridor_data.keys()[randi() % corridor_data.size()]
 
 	item.global_position = random_tile * SCALE_FACTOR
-	item.scale = Vector2(0.5, 0.5)
+	#item.scale = Vector2(0.5, 0.5)
 	item.connect("item_collected", Callable(self, "_on_player_collect_item"))
 	item.add_to_group("item")
 	call_deferred("add_child", item)
+
+func _spawn_spike() -> void:
+	var spike = spike_scene.instantiate()
+	var random_tile = room_data.keys()[randi() % room_data.size()]
+
+	spike.global_position = random_tile * SCALE_FACTOR
+	spike.connect("trap_pressed", Callable(self, "_player_pressed_trap"))
+	spike.add_to_group("spike")
+	call_deferred("add_child", spike)
 
 	
 func _spawn_player() -> void:
@@ -537,3 +563,10 @@ func _player_death() -> void:
 		DongeonGlobal.current_level = 0
 	else:
 		_spawn_player()
+
+func _player_pressed_trap(is_activated: bool) -> void:
+	if is_activated:
+		print("Player pressed on activated trap")
+		player.take_damage(10)
+	else:
+		print("Player pressed on deactivated trap")

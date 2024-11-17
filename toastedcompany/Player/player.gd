@@ -1,8 +1,7 @@
 extends GenericCharacter
 class_name Player
 
-@onready var timer: Timer = $FlashTimer
-const NB_FLASH: int = 16
+const NB_FLASH: int = 10
 var flash_counter: int
 var flash_value: int = 0
 var timer_timout_executed = true
@@ -24,40 +23,30 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	move_and_slide()
-
-	if (Input.is_action_just_pressed("ui_select")):
-		timer_timout_executed = false
-		timer.start()
-		
-	if timer.timeout and not timer_timout_executed:
-		_on_flashtimer_timeout()
-		
 	check_health(delta)
 
-func _on_flashtimer_timeout() -> void:
-	shader.set_shader_parameter("flash_modifier", flash_value * 0.5);
-	flash_value = !flash_value
-
-	if flash_counter < NB_FLASH:
+func damage_flash() -> void:
+	while flash_counter < NB_FLASH:
+		shader.set_shader_parameter("flash_modifier", flash_value * 0.5)
+		flash_value = !flash_value
 		flash_counter += 1
-	else:
-		timer_timout_executed = true
-		healthbar.value -= 100
-		
-		flash_counter = 0
-		shader.set_shader_parameter("flash_modifier", 0);
-		timer.stop()
-		
-func check_health(delta: float):
-	health = healthbar.value
+		await get_tree().create_timer(0.1).timeout
 	
+	flash_counter = 0
+	shader.set_shader_parameter("flash_modifier", 0)
+
+func take_damage(damage: int):
+	health -= damage
+	healthbar.value = health
+	damage_flash()
+	
+func check_health(delta: float):
 	if health <= 0 and not is_dead:
 		print("Player died")
 		is_dead = true
 		healthbar.value = 0
 		anim_player.play("die")
 		death_timer.start()
-		
 
 	#Update health color
 	if health <= 30:
@@ -68,4 +57,5 @@ func check_health(delta: float):
 		healthbar.modulate = Color(0, 1, 0)
 
 func _on_death_timer_timeout() -> void:
+	shader.set_shader_parameter("flash_modifier", 0)
 	player_respawn.emit()
