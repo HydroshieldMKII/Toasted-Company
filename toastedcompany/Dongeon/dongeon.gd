@@ -399,6 +399,8 @@ func _spawn_ennemies() -> void:
 		# minotaur.add_to_group("minotaur")
 		call_deferred("add_child", minotaur)
 
+func _setup_navigation() -> void:
+	pass
 
 # On Action
 
