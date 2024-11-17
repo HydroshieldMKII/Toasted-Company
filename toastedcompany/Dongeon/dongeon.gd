@@ -2,7 +2,9 @@ extends Node2D
 class_name Dongeon
 
 @export var player_scene := preload("res://Player/player.tscn") # Preload the player scene
+@export var splash_scene := preload("res://SplashScreens/splashscreen.tscn")
 var player: Player = null
+var splash: Splash = null
 
 @onready var fog: CanvasModulate = $Fog
 
@@ -132,7 +134,9 @@ func _ready() -> void:
 		_spawn_random_tunnel(true)
 		_spawn_player()
 		_update_uhd()
-	
+		#splash = splash_scene.instantiate()
+		#call_deferred("add_child", splash)
+		
 func _process(delta: float) -> void:
 	_manage_input()
 	pass
