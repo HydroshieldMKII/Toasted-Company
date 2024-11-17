@@ -7,6 +7,7 @@ var flash_value: int = 0
 var timer_timout_executed = true
 
 @onready var death_timer: Timer = $DeathTimer
+@onready var spawn_protection_time = $SpawnProtection
 
 var is_dead = false
 var health = 100
@@ -36,6 +37,8 @@ func damage_flash() -> void:
 	shader.set_shader_parameter("flash_modifier", 0)
 
 func take_damage(damage: int):
+	if spawn_protection_time.time_left > 0:
+		return
 	health -= damage
 	healthbar.value = health
 	damage_flash()

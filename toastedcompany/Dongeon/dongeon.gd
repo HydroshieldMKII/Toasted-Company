@@ -27,132 +27,43 @@ var map_drawn = false
 
 # Generation Config
 @export var rooms_size := Vector2(100, 140) # Size in pixels
-@export var corridor_width := 16
 
 var max_death_per_level = 3
 var current_nbr_of_death = 0
 
 # Level config
-var item_quantity_room = {
-	0: 3,
-	1: 3,
-	2: 5,
-	3: 7,
-	4: 9,
-	5: 11,
-	6: 11,
-	7: 12,
-	8: 13,
-	9: 14
-}
+# Dynamic level configuration functions
+func get_item_quantity_room() -> int:
+	return round(3 + DongeonGlobal.current_level * 2) # Example scaling: start with 3 and add 2 per level
 
-var item_quantity_corridor = {
-	0: 1,
-	1: 2,
-	2: 2,
-	3: 3,
-	4: 4,
-	5: 5,
-	6: 6,
-	7: 7,
-	8: 8,
-	9: 8
-}
+func get_item_quantity_corridor() -> int:
+	return round(1 + DongeonGlobal.current_level) # Example scaling: start with 1 and add 1 per level
 
-var respawn_quantity = {
-	0: 1,
-	1: 2,
-	2: 4,
-	3: 6,
-	4: 6,
-	5: 7,
-	6: 7,
-	7: 8,
-	8: 10,
-	9: 12
-}
+func get_respawn_quantity() -> int:
+	return round(1 + DongeonGlobal.current_level * 1.5) # Example scaling: start with 1 and add 1.5 per level
 
-var points_per_level = {
-	0: 100,
-	1: 300,
-	2: 500,
-	3: 700,
-	4: 900,
-	5: 1100,
-	6: 1400,
-	7: 2000,
-	8: 3000,
-	9: 5000
-}
+func get_points_per_level() -> int:
+	return round(100 + 200 * pow(DongeonGlobal.current_level, 1.2)) # Example non-linear scaling
 
-var dongeon_size_per_level = {
-	0: Vector2(1000, 750),
-	1: Vector2(1200, 900),
-	2: Vector2(1400, 1050),
-	3: Vector2(1600, 1200),
-	4: Vector2(1800, 1350),
-	5: Vector2(2000, 1500),
-	6: Vector2(2200, 1650),
-	7: Vector2(2400, 1800),
-	8: Vector2(2600, 1950),
-	9: Vector2(2800, 2100)
-}
+func get_dongeon_size() -> Vector2:
+	var base_size = Vector2(1000, 750) # Starting dungeon size
+	var scale = 1 + DongeonGlobal.current_level * 0.2 # Scale size by 20% per level
+	return Vector2(round(base_size.x * scale), round(base_size.y * scale))
 
-var rooms_max_per_level = {
-	0: 15,
-	1: 17,
-	2: 19,
-	3: 21,
-	4: 23,
-	5: 25,
-	6: 27,
-	7: 29,
-	8: 31,
-	9: 33
-}
+func get_rooms_max_per_level() -> int:
+	return round(15 + DongeonGlobal.current_level * 2) # Example scaling: start with 15 and add 2 per level
 
-var corridor_width_per_level = {
-	0: 16,
-	1: 16,
-	2: 16,
-	3: 16,
-	4: 16,
-	5: 16,
-	6: 16,
-	7: 16,
-	8: 16,
-	9: 16
-}
+func get_corridor_width() -> int:
+	return round(16) # Constant width, but can be dynamic if needed
 
-var spike_quantity_per_level = {
-	0: 10,
-	1: 2,
-	2: 3,
-	3: 4,
-	4: 5,
-	5: 6,
-	6: 7,
-	7: 8,
-	8: 9,
-	9: 10
-}
+func get_spike_quantity() -> int:
+	return round(20 + DongeonGlobal.current_level * 2) # Example scaling: start with 10 and add 1 per level
 
 var points_accumulated = 0
 
 func _ready() -> void:
 	if not map_drawn:
-		_generate_dongeon_data()
-		_draw_terrains()
-		_generate_occluders_collisions()
-		_spawn_random_items(DongeonGlobal.current_level)
-		_spawn_random_tunnel(true)
-		_spawn_player()
-		_update_uhd()
-
-		for i in range(spike_quantity_per_level[DongeonGlobal.current_level]):
-			_spawn_spike()
-		#splash = splash_scene.instantiate()
-		#call_deferred("add_child", splash)
+		dongeon_setup()
 		
 func _process(delta: float) -> void:
 	_manage_input()
@@ -198,7 +109,7 @@ func _manage_input() -> void:
 func _update_uhd() -> void:
 	var hud = player.get_node("HUD")
 	var score_label = hud.get_node("Score")
-	score_label.text = "Missing points: " + str(points_per_level[DongeonGlobal.current_level] - points_accumulated)
+	score_label.text = "Missing points: " + str(get_points_per_level() - points_accumulated)
 
 	var inventoryWarning = hud.get_node("InventoryWarning")
 	inventoryWarning.visible = false
@@ -214,7 +125,7 @@ func _generate_data() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 
-	for r in range(rooms_max_per_level[DongeonGlobal.current_level]):
+	for r in get_rooms_max_per_level():
 		var room = _get_random_room(rng)
 		if _intersects(rooms, room):
 			continue
@@ -230,8 +141,8 @@ func _get_random_room(rng: RandomNumberGenerator) -> Rect2:
 	var width = rng.randi_range(rooms_size.x, rooms_size.y)
 	var height = rng.randi_range(rooms_size.x, rooms_size.y)
 
-	var x = rng.randi_range(0, dongeon_size_per_level[DongeonGlobal.current_level].x - width)
-	var y = rng.randi_range(0, dongeon_size_per_level[DongeonGlobal.current_level].y - height)
+	var x = rng.randi_range(0, get_dongeon_size().x - width)
+	var y = rng.randi_range(0, get_dongeon_size().y - height)
 	return Rect2(Vector2(x, y), Vector2(width, height))
 
 func _add_room(room: Rect2) -> void:
@@ -251,7 +162,7 @@ func _add_connection(rng: RandomNumberGenerator, room1: Rect2, room2: Rect2) -> 
 
 func _add_corridor(start: int, end: int, constant: int, axis: int) -> void:
 	for t in range(min(start, end), max(start, end) + 1):
-		for offset in range(-int(corridor_width / 2), int(corridor_width / 2) + 1):
+		for offset in range(-int(get_corridor_width() / 2), int(get_corridor_width() / 2) + 1):
 			var point = Vector2.ZERO
 			match axis:
 				Vector2.AXIS_X: point = Vector2(t, constant + offset)
@@ -274,8 +185,8 @@ func _generate_occluders_collisions() -> void:
 			child.queue_free()
 
 	# Check all tiles and add occluders / collision bodies where needed
-	for x in range(0, dongeon_size_per_level[DongeonGlobal.current_level].x):
-		for y in range(0, dongeon_size_per_level[DongeonGlobal.current_level].y):
+	for x in range(0, get_dongeon_size().x):
+		for y in range(0, get_dongeon_size().y):
 			var tile = tile_map.get_cell_source_id(Vector2i(x, y))
 
 			# Skip if no tile exists or if it's part of a corridor
@@ -368,7 +279,7 @@ func _draw_terrains() -> void:
 
 		tile_map.set_cell(coords, 0, atlas_coord)
 		
-func _spawn_random_tunnel(closed: bool) -> void:
+func _spawn_random_tunnel() -> void:
 	if room_center.size() > 0:
 		# Choose a random room center
 		var random_room_center = room_center[randi() % room_center.size()]
@@ -382,20 +293,16 @@ func _spawn_random_tunnel(closed: bool) -> void:
 		# Create a new TileMap layer for the tunnel (closed or open)
 		tunnel_tile_map.tile_set = tile_map.tile_set
 		tunnel_tile_map.scale = Vector2(SCALE_FACTOR, SCALE_FACTOR)
+		for i in range(6):
+			for j in range(6):
+				# Calculate the exact tile position based on the scale and tile size
+				var tile_x = int((top_left_x + i * TILE_SIZE) / TILE_SIZE)
+				var tile_y = int((top_left_y + j * TILE_SIZE) / TILE_SIZE)
+				var tile_coord = Vector2i(tile_x, tile_y)
 
-		if closed:
-			for i in range(6):
-				for j in range(6):
-					# Calculate the exact tile position based on the scale and tile size
-					var tile_x = int((top_left_x + i * TILE_SIZE) / TILE_SIZE)
-					var tile_y = int((top_left_y + j * TILE_SIZE) / TILE_SIZE)
-					var tile_coord = Vector2i(tile_x, tile_y)
-
-					# Set atlas coordinates for the tile (example coordinates used here)
-					var atlas_coord = Vector2i(30 + i, 12 + j)
-					tunnel_tile_map.set_cell(tile_coord, 0, atlas_coord)
-		else:
-			print("Tunnel created, state:", closed)
+				# Set atlas coordinates for the tile (example coordinates used here)
+				var atlas_coord = Vector2i(30 + i, 12 + j)
+				tunnel_tile_map.set_cell(tile_coord, 0, atlas_coord)
 
 
 		# Add Area2D for detecting player entry into the tunnel (random room center)
@@ -413,9 +320,9 @@ func _spawn_random_tunnel(closed: bool) -> void:
 		tunnel_tile_map.call_deferred("add_child", area)
 
 		call_deferred("add_child", tunnel_tile_map)
-		print("Tunnel spawned at room center:", random_room_center, ", closed state:", closed)
+		print("Tunnel spawned at room center")
 	
-func _spawn_random_items(level: int) -> void:
+func _spawn_random_items() -> void:
 	# Clear any existing items
 	var items = get_tree().get_nodes_in_group("item")
 	for item in items:
@@ -425,13 +332,11 @@ func _spawn_random_items(level: int) -> void:
 	var item_sceen = preload("res://Items/item.tscn")
 	var item = item_sceen.instantiate()
 
-	var room_quantity = item_quantity_room[level]
 	if room_center.size() > 0:
-		for i in range(room_quantity):
+		for i in get_item_quantity_room():
 			_spawn_item(true)
 			
-	var corridor_quantity = item_quantity_corridor[level]
-	for i in range(corridor_quantity):
+	for i in get_item_quantity_corridor():
 		_spawn_item(false)
 
 func _spawn_item(in_room: bool) -> void:
@@ -450,14 +355,27 @@ func _spawn_item(in_room: bool) -> void:
 	item.add_to_group("item")
 	call_deferred("add_child", item)
 
-func _spawn_spike() -> void:
-	var spike = spike_scene.instantiate()
-	var random_tile = room_data.keys()[randi() % room_data.size()]
+func _spawn_spikes() -> void:
+	# Clear any existing spikes
+	var spikes = get_tree().get_nodes_in_group("spike")
+	for spike in spikes:
+		print("Clearing: ", spike)
+		spike.queue_free()
 
-	spike.global_position = random_tile * SCALE_FACTOR
-	spike.connect("trap_pressed", Callable(self, "_player_pressed_trap"))
-	spike.add_to_group("spike")
-	call_deferred("add_child", spike)
+	for i in get_spike_quantity():
+		var spike = spike_scene.instantiate()
+		var random_tile = room_data.keys()[randi() % room_data.size()]
+		
+		var spawn_in_corridor = randi() % 2 == 0
+		
+		if spawn_in_corridor and corridor_data.size() > 0:
+			random_tile = corridor_data.keys()[int(randi() % corridor_data.size())]
+		else:
+			random_tile = room_data.keys()[int(randi() % room_data.size())]
+
+		spike.global_position = random_tile * SCALE_FACTOR
+		spike.connect("trap_pressed", Callable(self, "_player_pressed_trap"))
+		call_deferred("add_child", spike)
 
 	
 func _spawn_player() -> void:
@@ -505,21 +423,9 @@ func _go_next_level() -> void:
 		print("Game completed!")
 		get_tree().quit()
 		return
-
+	
 	DongeonGlobal.current_level += 1
-	points_accumulated = 0
-	map_drawn = false
-
-	tunnel_tile_map.queue_free()
-	tile_map.clear()
-
-	_generate_dongeon_data()
-	_draw_terrains()
-	_generate_occluders_collisions()
-	_spawn_random_items(DongeonGlobal.current_level)
-	_spawn_random_tunnel(true)
-	_spawn_player()
-	_update_uhd()
+	dongeon_setup()
 
 func _on_tunnel_entered(area: Area2D) -> void:
 	if area.is_in_group("player"):
@@ -538,7 +444,7 @@ func _on_tunnel_entered(area: Area2D) -> void:
 
 		points_accumulated += (item1_value + item2_value)
 
-		if points_per_level[DongeonGlobal.current_level] - points_accumulated <= 0:
+		if get_points_per_level() - points_accumulated <= 0:
 			print("Level completed!")
 			_go_next_level()
 
@@ -570,3 +476,30 @@ func _player_pressed_trap(is_activated: bool) -> void:
 		player.take_damage(10)
 	else:
 		print("Player pressed on deactivated trap")
+		
+func dongeon_setup() -> void:
+	points_accumulated = 0
+	map_drawn = false
+	
+	# Clear old tilemap
+	if tunnel_tile_map:
+		tunnel_tile_map.queue_free()
+	tile_map.clear()
+
+	# Generate dongeon shape
+	_generate_dongeon_data()
+	_draw_terrains()
+	_generate_occluders_collisions()
+	
+	# Spawn goodies
+	_spawn_random_items()
+	
+	# Spawn danger
+	_spawn_spikes()
+	
+	# Spawn goodies endpoint
+	_spawn_random_tunnel()
+	
+	#Spawn the palyer
+	_spawn_player()
+	_update_uhd()

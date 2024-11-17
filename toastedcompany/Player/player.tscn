@@ -9,10 +9,10 @@
 [ext_resource type="Script" path="res://Player/StateMachine/player_idle.gd" id="5_371nc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_aklre"]
-size = Vector2(71, 85)
+size = Vector2(71, 72)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tmtka"]
-size = Vector2(71, 89)
+size = Vector2(71, 55)
 
 [sub_resource type="Animation" id="Animation_1xl30"]
 length = 0.001
@@ -154,13 +154,13 @@ height = 0.82
 max_distance = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-0.5, -4.5)
+position = Vector2(-0.5, 2)
 shape = SubResource("RectangleShape2D_aklre")
 
 [node name="Area2D" type="Area2D" parent="." groups=["player"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-position = Vector2(-0.5, -6.5)
+position = Vector2(-0.5, 2.5)
 shape = SubResource("RectangleShape2D_tmtka")
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -200,7 +200,7 @@ shadow_color = Color(0, 0, 0, 0.909804)
 shadow_filter = 2
 shadow_filter_smooth = 2.0
 texture = ExtResource("2_64dd5")
-texture_scale = 13.0
+texture_scale = 10.0
 
 [node name="Healthbar" type="ProgressBar" parent="."]
 modulate = Color(1.27546e-06, 0.471945, 0, 1)
@@ -291,6 +291,11 @@ grow_vertical = 0
 [node name="DeathTimer" type="Timer" parent="."]
 wait_time = 2.5
 one_shot = true
+
+[node name="SpawnProtection" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+autostart = true
 
 [connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]
 [connection signal="timeout" from="DeathTimer" to="." method="_on_death_timer_timeout"]

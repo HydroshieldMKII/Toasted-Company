@@ -17,7 +17,7 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	if is_player_inside_trap and timer_attack_delay.is_stopped():
+	if is_player_inside_trap and timer_attack_delay.time_left == 0:
 		timer_attack_delay.start()
 		trap_pressed.emit(is_activated)
 
@@ -59,12 +59,21 @@ func _on_timer_timeout() -> void:
 		for texture in textures:
 			spike_sprite.texture = texture
 			await get_tree().create_timer(0.05).timeout
-			
+
+	spike_sprite.texture = preload("res://Assests/Spike/spike_2.png")	
 	timer_fadeout.start()
 
 func _on_fadeout_timeout() -> void:
 	print("TRAP DEACTIVATED")
-	spike_sprite.texture = preload("res://Assests/Spike/spike_0.png")
+
+	var textures = [
+		preload("res://Assests/Spike/spike_1.png"),
+		preload("res://Assests/Spike/spike_0.png")
+	]
+
+	for texture in textures:
+		spike_sprite.texture = texture
+		await get_tree().create_timer(0.05).timeout
 
 	is_activated = false
 	is_trigger = false
