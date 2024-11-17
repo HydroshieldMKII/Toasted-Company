@@ -1,3 +1,137 @@
-[gd_scene format=3 uid="uid://30kmhrwb66lv"]
+[gd_scene load_steps=15 format=3 uid="uid://30kmhrwb66lv"]
 
-[node name="Minotaur" type="Node2D"]
+[ext_resource type="Script" path="res://Dongeon/Minotaur/minotaur.gd" id="1_n7rsb"]
+[ext_resource type="Texture2D" uid="uid://cb6ahidfcfnvb" path="res://Assests/Minotaur.png" id="2_g7ldu"]
+[ext_resource type="Script" path="res://Player/StateMachine/state_machine.gd" id="3_6rulc"]
+[ext_resource type="Script" path="res://Dongeon/Minotaur/StateMachine/mino_idle.gd" id="4_asptu"]
+[ext_resource type="Script" path="res://Dongeon/Minotaur/StateMachine/mino_taunt.gd" id="5_g3wsb"]
+[ext_resource type="Script" path="res://Dongeon/Minotaur/StateMachine/mino_charge.gd" id="6_xcpa7"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_peupa"]
+size = Vector2(143, 145)
+
+[sub_resource type="Animation" id="Animation_yjdsg"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame_coords")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2i(2, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_n267l"]
+resource_name = "idle"
+step = 0.03
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame_coords")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.0333333, 0.212121, 0.393939, 0.575758, 0.757576),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0), Vector2i(3, 0), Vector2i(4, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_qn6cc"]
+resource_name = "run"
+length = 0.7
+step = 0.03
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame_coords")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0909091, 0.181818, 0.272727, 0.363636, 0.454545, 0.545455, 0.636364),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1), Vector2i(3, 1), Vector2i(4, 1), Vector2i(5, 1), Vector2i(6, 1), Vector2i(7, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_2rjux"]
+resource_name = "taunt"
+length = 0.75
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame_coords")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2i(0, 5), Vector2i(1, 5), Vector2i(2, 5), Vector2i(4, 5), Vector2i(5, 5)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_cs0w1"]
+_data = {
+"RESET": SubResource("Animation_yjdsg"),
+"idle": SubResource("Animation_n267l"),
+"run": SubResource("Animation_qn6cc"),
+"taunt": SubResource("Animation_2rjux")
+}
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_oxkv6"]
+radius = 500.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_7g1qf"]
+radius = 339.14
+
+[node name="Minotaur" type="CharacterBody2D"]
+z_index = 10
+script = ExtResource("1_n7rsb")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-4.5, -15.5)
+shape = SubResource("RectangleShape2D_peupa")
+
+[node name="AnimationMinotaur" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_cs0w1")
+}
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(3.5, 3.5)
+texture = ExtResource("2_g7ldu")
+hframes = 9
+vframes = 10
+frame = 2
+
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
+script = ExtResource("3_6rulc")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateMachine" node_paths=PackedStringArray("minotaur")]
+script = ExtResource("4_asptu")
+minotaur = NodePath("../..")
+
+[node name="Taunt" type="Node" parent="StateMachine" node_paths=PackedStringArray("minotaur")]
+script = ExtResource("5_g3wsb")
+minotaur = NodePath("../..")
+
+[node name="Charge" type="Node" parent="StateMachine"]
+script = ExtResource("6_xcpa7")
+
+[node name="TauntArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TauntArea"]
+shape = SubResource("CircleShape2D_oxkv6")
+
+[node name="FollowArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FollowArea"]
+shape = SubResource("CircleShape2D_7g1qf")
+
+[connection signal="area_entered" from="TauntArea" to="StateMachine/Idle" method="_on_taunt_area_area_entered"]

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://drwa5iru2vur8"
-path="res://.godot/imported/minotaur_spritesheet.png-5738166fcceaabb0ce40ea8d5ed1b6b9.ctex"
+uid="uid://cb6ahidfcfnvb"
+path="res://.godot/imported/Minotaur.png-ff2c8b24a23084f5e9c0e1468c5e6203.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Dongeon/Minotaur/minotaur_spritesheet.png"
-dest_files=["res://.godot/imported/minotaur_spritesheet.png-5738166fcceaabb0ce40ea8d5ed1b6b9.ctex"]
+source_file="res://Assests/Minotaur.png"
+dest_files=["res://.godot/imported/Minotaur.png-ff2c8b24a23084f5e9c0e1468c5e6203.ctex"]
 
 [params]
 

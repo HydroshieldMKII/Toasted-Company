@@ -31,16 +31,15 @@ var map_drawn = false
 var max_death_per_level = 3
 var current_nbr_of_death = 0
 
-# Level config
 # Dynamic level configuration functions
 func get_item_quantity_room() -> int:
-	return round(3 + DongeonGlobal.current_level * 2) 
+	return round(3 + DongeonGlobal.current_level * 2)
 
 func get_item_quantity_corridor() -> int:
 	return round(1 + DongeonGlobal.current_level)
 
 func get_respawn_quantity() -> int:
-	return round(1 + DongeonGlobal.current_level * 1.5) 
+	return round(1 + DongeonGlobal.current_level * 1.5)
 
 func get_points_per_level() -> int:
 	return round(100 + 200 * pow(DongeonGlobal.current_level, 1.2))
@@ -59,6 +58,8 @@ func get_corridor_width() -> int:
 func get_spike_quantity() -> int:
 	return round(20 + DongeonGlobal.current_level * 2)
 
+func get_minotaur_quantity() -> int:
+	return round(1 + DongeonGlobal.current_level)
 var points_accumulated = 0
 
 func _ready() -> void:
@@ -68,6 +69,8 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_manage_input()
 	pass
+
+# Debug functions
 
 func _manage_input() -> void:
 	if player == null:
@@ -113,6 +116,8 @@ func _update_uhd() -> void:
 
 	var inventoryWarning = hud.get_node("InventoryWarning")
 	inventoryWarning.visible = false
+
+# Generation
 
 func _generate_dongeon_data() -> void:
 	room_data.clear()
@@ -278,7 +283,9 @@ func _draw_terrains() -> void:
 		var atlas_coord = Vector2i(random_x, random_y)
 
 		tile_map.set_cell(coords, 0, atlas_coord)
-		
+
+# Spawner
+
 func _spawn_random_tunnel() -> void:
 	if room_center.size() > 0:
 		# Choose a random room center
@@ -377,7 +384,24 @@ func _spawn_spikes() -> void:
 		spike.connect("trap_pressed", Callable(self, "_player_pressed_trap"))
 		call_deferred("add_child", spike)
 
-	
+func _spawn_ennemies() -> void:
+	# Clear any existing ennemies
+	var existing_minotaurs = get_tree().get_nodes_in_group("minotaur")
+	for m in existing_minotaurs:
+		m.queue_free()
+
+	var minotaur_scene = preload("res://Dongeon/Minotaur/minotaur.tscn")
+	for i in get_minotaur_quantity():
+		var minotaur = minotaur_scene.instantiate()
+		var random_tile = room_data.keys()[randi() % room_data.size()]
+		minotaur.global_position = random_tile * SCALE_FACTOR
+		#minotaur.connect("minotaur_death", Callable(self, "_on_minotaur_death"))
+		# minotaur.add_to_group("minotaur")
+		call_deferred("add_child", minotaur)
+
+
+# On Action
+
 func _spawn_player() -> void:
 	if room_center.size() > 0:
 		# Destroy any existing player instance
@@ -429,8 +453,6 @@ func _go_next_level() -> void:
 
 func _on_tunnel_entered(area: Area2D) -> void:
 	if area.is_in_group("player"):
-		print("Player entered tunnel")
-
 		var hud = player.get_node("HUD")
 		var item1 = hud.get_node("PanelContainer/MarginContainer/GridContainer/Item1")
 		var item2 = hud.get_node("PanelContainer/MarginContainer/GridContainer/Item2")
@@ -472,10 +494,7 @@ func _player_death() -> void:
 
 func _player_pressed_trap(is_activated: bool) -> void:
 	if is_activated:
-		print("Player pressed on activated trap")
 		player.take_damage(10)
-	else:
-		print("Player pressed on deactivated trap")
 		
 func dongeon_setup() -> void:
 	points_accumulated = 0
@@ -496,6 +515,7 @@ func dongeon_setup() -> void:
 	
 	# Spawn danger
 	_spawn_spikes()
+	_spawn_ennemies()
 	
 	# Spawn goodies endpoint
 	_spawn_random_tunnel()

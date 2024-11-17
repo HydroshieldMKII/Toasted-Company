@@ -26,7 +26,6 @@ func _on_area_2d_area_entered(area: Area2D) -> void:
 		is_player_inside_trap = true
 		trap_pressed.emit(is_activated) # Signal dongeon player pressed on activated trap
 		if not is_trigger:
-			print("TRAP TRIGGERED")
 			is_trigger = true
 			timer_fadein.start()
 
@@ -35,7 +34,6 @@ func _on_area_2d_area_exited(area: Area2D) -> void:
 		is_player_inside_trap = false
 
 func _on_timer_timeout() -> void:
-	print("TRAP ACTIVATED")
 	is_activated = true
 	for i in range(12):
 		var textures = [
@@ -64,8 +62,6 @@ func _on_timer_timeout() -> void:
 	timer_fadeout.start()
 
 func _on_fadeout_timeout() -> void:
-	print("TRAP DEACTIVATED")
-
 	var textures = [
 		preload("res://Assests/Spike/spike_1.png"),
 		preload("res://Assests/Spike/spike_0.png")
