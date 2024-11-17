@@ -34,16 +34,16 @@ var current_nbr_of_death = 0
 # Level config
 # Dynamic level configuration functions
 func get_item_quantity_room() -> int:
-	return round(3 + DongeonGlobal.current_level * 2) # Example scaling: start with 3 and add 2 per level
+	return round(3 + DongeonGlobal.current_level * 2) 
 
 func get_item_quantity_corridor() -> int:
-	return round(1 + DongeonGlobal.current_level) # Example scaling: start with 1 and add 1 per level
+	return round(1 + DongeonGlobal.current_level)
 
 func get_respawn_quantity() -> int:
-	return round(1 + DongeonGlobal.current_level * 1.5) # Example scaling: start with 1 and add 1.5 per level
+	return round(1 + DongeonGlobal.current_level * 1.5) 
 
 func get_points_per_level() -> int:
-	return round(100 + 200 * pow(DongeonGlobal.current_level, 1.2)) # Example non-linear scaling
+	return round(100 + 200 * pow(DongeonGlobal.current_level, 1.2))
 
 func get_dongeon_size() -> Vector2:
 	var base_size = Vector2(1000, 750) # Starting dungeon size
@@ -51,13 +51,13 @@ func get_dongeon_size() -> Vector2:
 	return Vector2(round(base_size.x * scale), round(base_size.y * scale))
 
 func get_rooms_max_per_level() -> int:
-	return round(15 + DongeonGlobal.current_level * 2) # Example scaling: start with 15 and add 2 per level
+	return round(15 + DongeonGlobal.current_level * 2)
 
 func get_corridor_width() -> int:
-	return round(16) # Constant width, but can be dynamic if needed
+	return round(16)
 
 func get_spike_quantity() -> int:
-	return round(20 + DongeonGlobal.current_level * 2) # Example scaling: start with 10 and add 1 per level
+	return round(20 + DongeonGlobal.current_level * 2)
 
 var points_accumulated = 0
 
