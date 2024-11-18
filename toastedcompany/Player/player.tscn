@@ -157,6 +157,7 @@ position = Vector2(-0.5, 2.5)
 shape = SubResource("RectangleShape2D_tmtka")
 
 [node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(0.5, 0.5)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -210,12 +211,13 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -159.0
-offset_top = -212.0
-offset_right = 170.0
-offset_bottom = -88.0
+offset_left = -92.0
+offset_top = -115.0
+offset_right = 330.0
+offset_bottom = 57.0
 grow_horizontal = 2
 grow_vertical = 0
+scale = Vector2(0.5, 0.5)
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
@@ -228,7 +230,6 @@ columns = 2
 
 [node name="Item1" type="TextureRect" parent="HUD/PanelContainer/MarginContainer/GridContainer"]
 layout_mode = 2
-stretch_mode = 3
 
 [node name="Item2" type="TextureRect" parent="HUD/PanelContainer/MarginContainer/GridContainer"]
 layout_mode = 2
@@ -238,7 +239,13 @@ offset_left = 100.0
 offset_top = 100.0
 offset_right = 238.0
 offset_bottom = 123.0
-scale = Vector2(2, 2)
+
+[node name="LiveLeft" type="Label" parent="HUD"]
+offset_left = 100.0
+offset_top = 130.0
+offset_right = 238.0
+offset_bottom = 153.0
+text = "Lives left: 3"
 
 [node name="InventoryWarning" type="Label" parent="HUD"]
 modulate = Color(1, 1, 0.0980392, 1)
@@ -247,10 +254,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -183.0
-offset_top = -311.0
-offset_right = 189.0
-offset_bottom = -288.0
+offset_left = -182.0
+offset_top = -159.0
+offset_right = 190.0
+offset_bottom = -136.0
 grow_horizontal = 2
 grow_vertical = 0
 text = "Inventory full! Drop loots at the trap to continue"
@@ -261,10 +268,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -97.0
-offset_top = -118.0
-offset_right = -60.0
-offset_bottom = -95.0
+offset_left = -58.0
+offset_top = -29.0
+offset_right = -8.0
+offset_bottom = -6.0
 grow_horizontal = 2
 grow_vertical = 0
 
@@ -274,10 +281,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = 78.0
-offset_top = -120.0
-offset_right = 112.0
-offset_bottom = -97.0
+offset_left = 52.0
+offset_top = -32.0
+offset_right = 101.0
+offset_bottom = -9.0
 grow_horizontal = 2
 grow_vertical = 0
 

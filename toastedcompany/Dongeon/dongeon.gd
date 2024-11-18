@@ -30,7 +30,6 @@ var map_drawn = false
 @export var rooms_size := Vector2(100, 140) # Size in pixels
 
 var max_death_per_level = 3
-var current_nbr_of_death = 0
 var speed_negation_per_item = 40
 var ligth_negation_per_item = 2 # 2 scale
 
@@ -120,7 +119,9 @@ func _update_uhd() -> void:
 	var score_label = hud.get_node("Score")
 	score_label.text = "Missing points: " + str(get_points_per_level() - points_accumulated)
 	
-
+	var lives_left = hud.get_node("LiveLeft")
+	lives_left.text = "Lives left: " + str(DongeonGlobal.current_lives)
+	
 	var inventoryWarning = hud.get_node("InventoryWarning")
 	inventoryWarning.visible = false
 
@@ -542,10 +543,11 @@ func _on_tunnel_entered(area: Area2D) -> void:
 		hud.get_node("ItemScore2").text = ""
 
 func _player_death() -> void:
-	current_nbr_of_death += 1
+	DongeonGlobal.current_lives	 -= 1
 	
-	if current_nbr_of_death >= max_death_per_level:
+	if DongeonGlobal.current_lives == -1:
 		DongeonGlobal.current_level = 0
+		DongeonGlobal.current_lives = 3
 		get_tree().reload_current_scene()
 	else:
 		_spawn_player()
