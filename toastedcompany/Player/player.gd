@@ -61,6 +61,7 @@ func check_health(delta: float):
 func _on_death_timer_timeout() -> void:
 	shader.set_shader_parameter("flash_modifier", 0)
 	healthbar.value = 100
+	spawn_protection_time.start()
 	player_respawn.emit()
 
 

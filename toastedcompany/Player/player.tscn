@@ -282,7 +282,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="DeathTimer" type="Timer" parent="."]
-wait_time = 4.0
+wait_time = 5.0
 one_shot = true
 
 [node name="SpawnProtection" type="Timer" parent="."]

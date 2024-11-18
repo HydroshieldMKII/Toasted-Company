@@ -7,15 +7,10 @@ var anim_minotaur: AnimationPlayer
 var pre_charge_count = 0
 var charging = false
 var target = null
-var last_position = Vector2.ZERO # Track last position to detect being stuck
-var stuck_count = 0 # Count consecutive frames where no movement occurred
-var max_stuck_frames = 2 # Adjustable parameter to decide when to reverse
 
 func enter():
 	anim_minotaur = minotaur.get_animation_minotaur()
 	player = get_tree().get_nodes_in_group("player")[0]
-	last_position = minotaur.global_position
-	stuck_count = 0
 
 func update(delta: float) -> void:
 	if not anim_minotaur:
@@ -41,21 +36,6 @@ func physics_update(delta: float) -> void:
 		var current_position = minotaur.global_position
 		var collision = minotaur.move_and_collide(target * minotaur.speed * delta)
 		
-		# Check if stuck
-		print("diff: ", current_position.distance_to(last_position))
-		if current_position.distance_to(last_position) < 1.0:
-			stuck_count += 1
-			print(stuck_count)
-			if stuck_count >= max_stuck_frames:
-				# Reverse direction and reset stuck counter
-				print("Dashing away")
-				target = -target
-				stuck_count = 0
-		else:
-			stuck_count = 0
-
-		last_position = current_position
-
 		if collision:
 			handle_collision(collision)
 
@@ -70,8 +50,8 @@ func handle_collision(collision: KinematicCollision2D):
 		minotaur.big_attack_damage = 200
 
 	minotaur.speed *= 1.1
-	if minotaur.speed > 500:
-		minotaur.speed = 500
+	if minotaur.speed > 700:
+		minotaur.speed = 700
 
 	# Increase the chance of big attack
 	var new_chance = minotaur.big_attack_chance * 1.1
@@ -85,11 +65,11 @@ func handle_collision(collision: KinematicCollision2D):
 		minotaur.get_node("ChargeArea/CollisionShape2D").shape = new_charge_area
 
 	var new_scale = minotaur.get_node("CollisionShape2D").scale * 1.1
-	if new_scale.x <= 1.5 and new_scale.y <= 1.5:
+	if new_scale.x <= 2.5 and new_scale.y <= 2.5:
 		minotaur.get_node("CollisionShape2D").scale = new_scale
 
 	var new_sprite_scale = minotaur.sprite.scale * 1.1
-	if new_sprite_scale.x <= 10 and new_sprite_scale.y <= 10:
+	if new_sprite_scale.x <= 8 and new_sprite_scale.y <= 8:
 		minotaur.sprite.scale = new_sprite_scale
 
 	# Handle transition based on collision

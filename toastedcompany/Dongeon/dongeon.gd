@@ -32,7 +32,7 @@ var map_drawn = false
 var max_death_per_level = 3
 var current_nbr_of_death = 0
 var speed_negation_per_item = 40
-var ligth_negation_per_item = 2 #2 scale
+var ligth_negation_per_item = 2 # 2 scale
 
 # Dynamic level configuration functions
 func get_item_quantity_room() -> int:
@@ -63,6 +63,10 @@ func get_spike_quantity() -> int:
 
 func get_minotaur_quantity() -> int:
 	return round(1 + DongeonGlobal.current_level)
+	
+func get_tunnel_quantity() -> int:
+	return round(1 + DongeonGlobal.current_level * 0.75)
+	
 var points_accumulated = 0
 
 func _ready() -> void:
@@ -289,34 +293,33 @@ func _draw_terrains() -> void:
 		tile_map.set_cell(coords, 0, atlas_coord)
 
 # Spawner
+func _spawn_random_tunnels() -> void:
+	var tunnels_spawned = 0
+	var max_tunnels = get_tunnel_quantity()
+	var rooms_with_tunnels = []
 
-func _spawn_random_tunnel() -> void:
-	if room_center.size() > 0:
-		# Choose a random room center
-		var random_room_center = room_center[randi() % room_center.size()]
+	while tunnels_spawned < max_tunnels and rooms_with_tunnels.size() < room_center.size():
+		var random_room_index = randi() % room_center.size()
+		if random_room_index in rooms_with_tunnels:
+			continue
 
-		# Calculate the top-left corner of the tunnel area, centered at the room center.
-		# Adjust for the tunnel width and scale.
+		rooms_with_tunnels.append(random_room_index)
+		var random_room_center = room_center[random_room_index]
 		var top_left_x = random_room_center.x - (3 * TILE_SIZE * SCALE_FACTOR) / 6
 		var top_left_y = random_room_center.y - (3 * TILE_SIZE * SCALE_FACTOR) / 6
 
 		tunnel_tile_map = TileMapLayer.new()
-		# Create a new TileMap layer for the tunnel (closed or open)
 		tunnel_tile_map.tile_set = tile_map.tile_set
 		tunnel_tile_map.scale = Vector2(SCALE_FACTOR, SCALE_FACTOR)
 		for i in range(6):
 			for j in range(6):
-				# Calculate the exact tile position based on the scale and tile size
 				var tile_x = int((top_left_x + i * TILE_SIZE) / TILE_SIZE)
 				var tile_y = int((top_left_y + j * TILE_SIZE) / TILE_SIZE)
 				var tile_coord = Vector2i(tile_x, tile_y)
 
-				# Set atlas coordinates for the tile (example coordinates used here)
 				var atlas_coord = Vector2i(30 + i, 12 + j)
 				tunnel_tile_map.set_cell(tile_coord, 0, atlas_coord)
 
-
-		# Add Area2D for detecting player entry into the tunnel (random room center)
 		var area = Area2D.new()
 		var circle_shape = CircleShape2D.new()
 		circle_shape.radius = TILE_SIZE * 2.5
@@ -332,6 +335,8 @@ func _spawn_random_tunnel() -> void:
 
 		call_deferred("add_child", tunnel_tile_map)
 		print("Tunnel spawned at room center")
+
+		tunnels_spawned += 1
 	
 func _spawn_random_items() -> void:
 	# Clear any existing items
@@ -540,8 +545,12 @@ func dongeon_setup() -> void:
 	tile_map.clear()
 
 	# Generate dongeon shape
-	_generate_dongeon_data()
-	_draw_terrains()
+	await _generate_dongeon_data()
+
+	#wait 10 sec
+	await get_tree().create_timer(10, true)
+
+	await _draw_terrains()
 	_generate_occluders_collisions()
 	
 	# Spawn goodies
@@ -552,7 +561,7 @@ func dongeon_setup() -> void:
 	_update_uhd()
 	
 	# Spawn goodies endpoint
-	_spawn_random_tunnel()
+	_spawn_random_tunnels()
 	
 	# Spawn danger
 	_spawn_spikes()
