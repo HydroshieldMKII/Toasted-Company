@@ -10,7 +10,7 @@ size = Vector2(69, 63)
 script = ExtResource("1_6xvtm")
 
 [node name="Fadein" type="Timer" parent="."]
-wait_time = 0.6
+wait_time = 0.45
 one_shot = true
 
 [node name="Fadeout" type="Timer" parent="."]

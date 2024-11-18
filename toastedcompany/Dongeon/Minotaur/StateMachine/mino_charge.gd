@@ -39,17 +39,23 @@ func physics_update(delta: float) -> void:
 			target = null
 			pre_charge_count = 0
 
-			# Scaling
-			minotaur.get_node("ChargeArea/CollisionShape2D").scale *= 1.1
+			# Scaling abilities
 			minotaur.base_attack_damage *= 1.2
 			minotaur.big_attack_damage *= 1.1
 			minotaur.speed *= 1.1
 
-			# Make the sprite bigger
+			# Increase the chance of big attack
+			var new_chance = minotaur.big_attack_chance * 1.1
+			if new_chance <= 100:
+				minotaur.big_attack_chance = new_chance
+
+			# Make the mintaur bigger
+			minotaur.get_node("ChargeArea/CollisionShape2D").scale *= 1.05
 			minotaur.sprite.scale *= 1.1
-			minotaur.get_node("CollisionShape2D").scale *= 1.1
+			var new_scale = minotaur.get_node("CollisionShape2D").scale * 1.1
+			if new_scale.x <= 3.0 and new_scale.y <= 3.0:
+				minotaur.get_node("CollisionShape2D").scale = new_scale
 			
-			print("Mino collision")
 			# If collide with player, transition to attack state
 			if collision.get_collider().name == 'Player':
 				Transitioned.emit(self, "Attack")

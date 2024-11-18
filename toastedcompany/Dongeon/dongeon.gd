@@ -421,18 +421,28 @@ func _setup_navigation() -> void:
 func _spawn_player() -> void:
 	if room_center.size() > 0:
 		# Destroy any existing player instance
-		if player != null:
-			player.queue_free()
+		if player == null:
+			player = player_scene.instantiate()
+			player.connect("player_respawn", Callable(self, "_player_death"))
+			call_deferred("add_child", player)
+		else:
+			#clear items and set back life
+			var hud = player.get_node("HUD")
+			var item1 = hud.get_node("PanelContainer/MarginContainer/GridContainer/Item1")
+			var item2 = hud.get_node("PanelContainer/MarginContainer/GridContainer/Item2")
+			item1.texture = null
+			item2.texture = null
+			hud.get_node("ItemScore1").text = ""
+			hud.get_node("ItemScore2").text = ""
+			player.health = 100
+			player.get_node("StateMachine/Walk").move_speed = 200
 
 		# Choose a random room center
 		var random_room_center = room_center[randi() % room_center.size()]
 		
 		# Calculate the player position and instantiate the player
 		var player_position = random_room_center * SCALE_FACTOR
-		player = player_scene.instantiate()
 		player.global_position = player_position
-		player.connect("player_respawn", Callable(self, "_player_death"))
-		call_deferred("add_child", player)
 		
 		print("Player spawn pos: ", player_position)
 		_update_uhd()
