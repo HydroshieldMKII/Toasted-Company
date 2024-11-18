@@ -93,9 +93,9 @@ func handle_collision(collision: KinematicCollision2D):
 		minotaur.sprite.scale = new_sprite_scale
 
 	# Handle transition based on collision
-	if collision.get_collider().name == 'Player':
+	if collision.get_collider().name == 'Player' and not player.is_dead:
 		Transitioned.emit(self, "Attack")
-	elif minotaur.get_node("ChargeArea").overlaps_body(player):
+	elif minotaur.get_node("ChargeArea").overlaps_body(player) and not player.is_dead:
 		Transitioned.emit(self, "Charge")
 	elif minotaur.get_node("TauntArea").overlaps_body(player):
 		Transitioned.emit(self, "Taunt")

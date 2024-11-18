@@ -9,7 +9,7 @@ var timer_timout_executed = true
 @onready var death_timer: Timer = $DeathTimer
 @onready var spawn_protection_time = $SpawnProtection
 
-var is_dead = false
+@export var is_dead = false
 var health = 100
 @onready var healthbar = $Healthbar
 

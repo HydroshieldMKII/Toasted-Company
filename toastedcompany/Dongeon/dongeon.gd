@@ -56,7 +56,7 @@ func get_rooms_max_per_level() -> int:
 	return round(15 + DongeonGlobal.current_level * 2)
 
 func get_corridor_width() -> int:
-	return round(32)
+	return round(24)
 
 func get_spike_quantity() -> int:
 	return round(30 + DongeonGlobal.current_level * 7.5)
@@ -415,11 +415,7 @@ func _spawn_ennemies() -> void:
 func _on_minotaur_attack(damage: int) -> void:
 	player.take_damage(damage)
 
-func _setup_navigation() -> void:
-	pass
-
 # On Action
-
 func _spawn_player() -> void:
 	if room_center.size() > 0:
 		# Destroy any existing player instance
@@ -439,6 +435,7 @@ func _spawn_player() -> void:
 			player.health = 100
 			player.is_dead = false
 			player.get_node("StateMachine/Walk").move_speed = 425.0
+			player.get_node("PointLight2D").texture_scale = 14
 			
 
 		# Choose a random room center
