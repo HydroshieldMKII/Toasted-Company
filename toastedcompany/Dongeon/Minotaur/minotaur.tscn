@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://30kmhrwb66lv"]
+[gd_scene load_steps=20 format=3 uid="uid://30kmhrwb66lv"]
 
 [ext_resource type="Script" path="res://Dongeon/Minotaur/minotaur.gd" id="1_n7rsb"]
 [ext_resource type="Texture2D" uid="uid://cb6ahidfcfnvb" path="res://Assests/Minotaur.png" id="2_g7ldu"]
@@ -6,12 +6,10 @@
 [ext_resource type="Script" path="res://Dongeon/Minotaur/StateMachine/mino_idle.gd" id="4_asptu"]
 [ext_resource type="Script" path="res://Dongeon/Minotaur/StateMachine/mino_taunt.gd" id="5_g3wsb"]
 [ext_resource type="Script" path="res://Dongeon/Minotaur/StateMachine/mino_charge.gd" id="6_xcpa7"]
+[ext_resource type="Script" path="res://Dongeon/Minotaur/StateMachine/mino_attack.gd" id="7_1eatq"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_jb5gn"]
-size = Vector2(103, 144)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_peupa"]
-size = Vector2(135, 160)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_44qbk"]
+size = Vector2(118, 163)
 
 [sub_resource type="Animation" id="Animation_yjdsg"]
 length = 0.001
@@ -95,12 +93,47 @@ tracks/0/keys = {
 "values": [Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1), Vector2i(3, 1), Vector2i(4, 1), Vector2i(5, 1), Vector2i(6, 1), Vector2i(7, 1)]
 }
 
+[sub_resource type="Animation" id="Animation_m4kvb"]
+resource_name = "small_attack"
+step = 0.06
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame_coords")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.117647, 0.235294, 0.352941, 0.470588, 0.588235, 0.705882, 0.823529),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2i(0, 6), Vector2i(2, 6), Vector2i(3, 6), Vector2i(4, 6), Vector2i(5, 6), Vector2i(6, 6), Vector2i(7, 6), Vector2i(8, 6)]
+}
+
+[sub_resource type="Animation" id="Animation_mcx0q"]
+resource_name = "big_attack"
+length = 0.85
+step = 0.06
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame_coords")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.117647, 0.235294, 0.352941, 0.470588, 0.588235, 0.705882),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2i(0, 3), Vector2i(1, 3), Vector2i(2, 3), Vector2i(3, 3), Vector2i(4, 3), Vector2i(6, 3), Vector2i(8, 3)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_cs0w1"]
 _data = {
 "RESET": SubResource("Animation_yjdsg"),
+"big_attack": SubResource("Animation_mcx0q"),
 "charge": SubResource("Animation_qn6cc"),
 "idle": SubResource("Animation_n267l"),
 "pre_charge": SubResource("Animation_6sou0"),
+"small_attack": SubResource("Animation_m4kvb"),
 "taunt": SubResource("Animation_2rjux")
 }
 
@@ -110,20 +143,19 @@ radius = 500.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_7g1qf"]
 radius = 300.0
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_peupa"]
+size = Vector2(54, 81)
+
 [node name="Minotaur" type="CharacterBody2D"]
 z_index = 10
 script = ExtResource("1_n7rsb")
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
-position = Vector2(-9.5, -16)
-shape = SubResource("RectangleShape2D_jb5gn")
 
 [node name="Body" type="Area2D" parent="."]
 position = Vector2(-10, 0.5)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Body"]
-position = Vector2(2.5, -16.5)
-shape = SubResource("RectangleShape2D_peupa")
+position = Vector2(2, -14)
+shape = SubResource("RectangleShape2D_44qbk")
 
 [node name="AnimationMinotaur" type="AnimationPlayer" parent="."]
 libraries = {
@@ -153,6 +185,10 @@ minotaur = NodePath("../..")
 script = ExtResource("6_xcpa7")
 minotaur = NodePath("../..")
 
+[node name="Attack" type="Node" parent="StateMachine" node_paths=PackedStringArray("minotaur")]
+script = ExtResource("7_1eatq")
+minotaur = NodePath("../..")
+
 [node name="TauntArea" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TauntArea"]
@@ -165,16 +201,14 @@ debug_color = Color(0.508364, 0.572378, 0.243815, 0.42)
 shape = SubResource("CircleShape2D_7g1qf")
 debug_color = Color(0.975809, 0.109951, 0.282128, 0.42)
 
-[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-simplify_path = true
-debug_enabled = true
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(2.5, -16.5)
+position = Vector2(-6, -9)
 shape = SubResource("RectangleShape2D_peupa")
 
 [connection signal="animation_finished" from="AnimationMinotaur" to="StateMachine/Charge" method="_on_animation_minotaur_animation_finished"]
+[connection signal="animation_finished" from="AnimationMinotaur" to="StateMachine/Attack" method="_on_animation_minotaur_animation_finished"]
 [connection signal="area_entered" from="TauntArea" to="StateMachine/Idle" method="_on_taunt_area_area_entered"]
 [connection signal="area_exited" from="TauntArea" to="StateMachine/Taunt" method="_on_taunt_area_area_exited"]
 [connection signal="area_exited" from="TauntArea" to="StateMachine/Charge" method="_on_taunt_area_area_exited"]
+[connection signal="area_entered" from="ChargeArea" to="StateMachine/Idle" method="_on_charge_area_area_entered"]
 [connection signal="area_entered" from="ChargeArea" to="StateMachine/Taunt" method="_on_charge_area_area_entered"]

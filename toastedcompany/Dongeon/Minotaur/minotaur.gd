@@ -1,6 +1,8 @@
 extends CharacterBody2D
 class_name Minotaur
 
+signal mino_attack_player(damage: int)
+
 var anim_minotaur: AnimationPlayer
 var sprite: Sprite2D
 var shader: ShaderMaterial
@@ -14,6 +16,11 @@ func _ready() -> void:
 	#shader = sprite.material as ShaderMaterial
 	anim_minotaur.play("idle")
 
+	$StateMachine/Attack.connect("mino_attack", Callable(self, "_on_mino_attack_player"))
+
+func _on_mino_attack_player(damage: int) -> void:
+	print("Minotaur attack player")
+	emit_signal("mino_attack_player", damage)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

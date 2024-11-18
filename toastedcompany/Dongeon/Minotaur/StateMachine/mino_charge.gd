@@ -12,7 +12,7 @@ var target = null
 func enter():
 	anim_minotaur = minotaur.get_animation_minotaur()
 	if minotaur.get_parent():
-		player = minotaur.get_parent().get_node_or_null("Player")
+		player = minotaur.get_parent().get_node("Player")
 
 func update(delta: float) -> void:
 	if not anim_minotaur:
@@ -39,12 +39,12 @@ func physics_update(delta: float) -> void:
 			charging = false
 			target = null
 			pre_charge_count = 0
-
+			
+			print("Mino collision")
 			# If collide with player, transition to attack state
 			if collision.get_collider().name == 'Player':
-				pass
-				
-			if minotaur.get_node("ChargeArea").overlaps_body(player):
+				Transitioned.emit(self, "Attack")
+			elif minotaur.get_node("ChargeArea").overlaps_body(player):
 				Transitioned.emit(self, "Charge")
 			elif minotaur.get_node("TauntArea").overlaps_body(player):
 				Transitioned.emit(self, "Taunt")

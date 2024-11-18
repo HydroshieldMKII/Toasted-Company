@@ -1,24 +1,24 @@
 extends BaseState
 class_name MinoTaunt
 
-@export var minotaur : Minotaur
+@export var minotaur: Minotaur
 @export var player: CharacterBody2D # Reference to the player node
-var anim_minotaur : AnimationPlayer
+var anim_minotaur: AnimationPlayer
 
 func enter():
-	anim_minotaur = minotaur.get_animation_minotaur()	
+	anim_minotaur = minotaur.get_animation_minotaur()
 	if minotaur.get_parent():
-		player = minotaur.get_parent().get_node_or_null("Player")
+		player = minotaur.get_parent().get_node("Player")
 		
 func update(delta: float) -> void:
 	#if minotaur.is_dead:
 		#return
 		
-	if not anim_minotaur :
+	if not anim_minotaur:
 		anim_minotaur = minotaur.get_animation_minotaur()
 	
 func physics_update(delta: float) -> void:
-	if not anim_minotaur : return
+	if not anim_minotaur: return
 	#if minotaur.is_dead: return
 	anim_minotaur.play("taunt")
 	

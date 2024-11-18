@@ -395,9 +395,11 @@ func _spawn_ennemies() -> void:
 		var minotaur = minotaur_scene.instantiate()
 		var random_tile = room_data.keys()[randi() % room_data.size()]
 		minotaur.global_position = random_tile * SCALE_FACTOR
-		#minotaur.connect("minotaur_death", Callable(self, "_on_minotaur_death"))
-		# minotaur.add_to_group("minotaur")
+		minotaur.connect("mino_attack_player", Callable(self, "_on_minotaur_attack"))
 		call_deferred("add_child", minotaur)
+		
+func _on_minotaur_attack(damage: int) -> void:
+	player.take_damage(damage)
 
 func _setup_navigation() -> void:
 	pass

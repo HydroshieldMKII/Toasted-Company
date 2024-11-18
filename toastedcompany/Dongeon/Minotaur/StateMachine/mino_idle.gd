@@ -5,7 +5,7 @@ class_name MinoIdle
 var anim_minotaur : AnimationPlayer
 
 func enter():
-	anim_minotaur = minotaur.get_animation_minotaur()	
+	anim_minotaur = minotaur.get_animation_minotaur()
 	
 func update(delta: float) -> void:
 	#if minotaur.is_dead:
@@ -21,6 +21,13 @@ func physics_update(delta: float) -> void:
 		
 	anim_minotaur.play("idle")
 	
+
+# Spawned in range
 func _on_taunt_area_area_entered(area: Area2D) -> void:
 	if area.is_in_group("player"):
 		Transitioned.emit(self, "Taunt")
+
+
+func _on_charge_area_area_entered(area: Area2D) -> void:
+	if area.is_in_group("player"):
+		Transitioned.emit(self, "Charge")
