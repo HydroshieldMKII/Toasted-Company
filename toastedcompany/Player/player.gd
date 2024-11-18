@@ -8,6 +8,7 @@ var timer_timout_executed = true
 
 @onready var death_timer: Timer = $DeathTimer
 @onready var spawn_protection_time = $SpawnProtection
+@onready var regen_timer = $HealthRegen
 
 @export var is_dead = false
 var health = 100
@@ -37,6 +38,7 @@ func damage_flash() -> void:
 	shader.set_shader_parameter("flash_modifier", 0)
 
 func take_damage(damage: int):
+	regen_timer.start() #Restart regen delay
 	if spawn_protection_time.time_left > 0:
 		return
 	health -= damage
@@ -68,3 +70,11 @@ func _on_death_timer_timeout() -> void:
 func _on_animation_player_animation_finished(anim_name: StringName) -> void:
 	if anim_name == "die":
 		death_timer.start()
+
+
+func _on_health_regen_timeout() -> void:
+	if health < 100:
+		health += 5
+		if health > 100:
+			health = 100
+		healthbar.value = health
