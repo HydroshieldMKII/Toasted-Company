@@ -7,11 +7,11 @@ class_name Dongeon
 var player: Player = null
 var splash: Splash = null
 var minotaurs: Array = []
+var tunnels: Array = []
 
 @onready var fog: CanvasModulate = $Fog
 
 # TileMapLayer
-var tunnel_tile_map: TileMapLayer = null
 @onready var tile_map := $Level
 
 # Generation data
@@ -70,8 +70,7 @@ func get_tunnel_quantity() -> int:
 var points_accumulated = 0
 
 func _ready() -> void:
-	if not map_drawn:
-		dongeon_setup()
+	dongeon_setup()
 		
 func _process(delta: float) -> void:
 	_manage_input()
@@ -149,6 +148,7 @@ func _generate_data() -> void:
 			_add_connection(rng, room_previous, room)
 		rooms.append(room)
 		room_center.append((room.position + room.end) / 2)
+	print("Generate data done")
 
 func _get_random_room(rng: RandomNumberGenerator) -> Rect2:
 	var width = rng.randi_range(rooms_size.x, rooms_size.y)
@@ -268,10 +268,6 @@ func _create_wall(x, y, direction) -> void:
 	call_deferred("add_child", occluder)
 
 func _draw_terrains() -> void:
-	if map_drawn:
-		return
-	else:
-		map_drawn = true
 	print("Drawing dungeon...")
 
 	# Tiles for corridors
@@ -298,51 +294,68 @@ func _spawn_random_tunnels() -> void:
 	var max_tunnels = get_tunnel_quantity()
 	var rooms_with_tunnels = []
 
+	# Clear any existing tunnels
+	for tunnel in tunnels:
+		tunnel.queue_free()
+		tunnels.erase(tunnel)
+
 	while tunnels_spawned < max_tunnels and rooms_with_tunnels.size() < room_center.size():
+		# Choose a random room that hasn't had a tunnel spawned yet
 		var random_room_index = randi() % room_center.size()
 		if random_room_index in rooms_with_tunnels:
 			continue
 
+		# Mark the room as having a tunnel
 		rooms_with_tunnels.append(random_room_index)
 		var random_room_center = room_center[random_room_index]
+
+		# Calculate top-left corner of the tunnel area
 		var top_left_x = random_room_center.x - (3 * TILE_SIZE * SCALE_FACTOR) / 6
 		var top_left_y = random_room_center.y - (3 * TILE_SIZE * SCALE_FACTOR) / 6
 
-		tunnel_tile_map = TileMapLayer.new()
+		# Create a new tilemap for the tunnel
+		var tunnel_tile_map = TileMapLayer.new()
 		tunnel_tile_map.tile_set = tile_map.tile_set
 		tunnel_tile_map.scale = Vector2(SCALE_FACTOR, SCALE_FACTOR)
+		tunnels.append(tunnel_tile_map)
+
+		# Set tunnel tiles
 		for i in range(6):
 			for j in range(6):
 				var tile_x = int((top_left_x + i * TILE_SIZE) / TILE_SIZE)
 				var tile_y = int((top_left_y + j * TILE_SIZE) / TILE_SIZE)
 				var tile_coord = Vector2i(tile_x, tile_y)
 
-				var atlas_coord = Vector2i(30 + i, 12 + j)
+				var atlas_coord = Vector2i(30 + i, 12 + j) # Example tile coordinates
 				tunnel_tile_map.set_cell(tile_coord, 0, atlas_coord)
 
+		# Create collision for the tunnel area
 		var area = Area2D.new()
 		var circle_shape = CircleShape2D.new()
 		circle_shape.radius = TILE_SIZE * 2.5
-		
+
 		var collision_shape = CollisionShape2D.new()
 		collision_shape.shape = circle_shape
-		area.call_deferred("add_child", collision_shape)
+		area.add_child(collision_shape)
 		area.position = random_room_center
-		print("Area position:", area.position)
 
+		# Connect signals for area interactions
 		area.connect("area_entered", Callable(self, "_on_tunnel_entered"))
-		tunnel_tile_map.call_deferred("add_child", area)
 
-		call_deferred("add_child", tunnel_tile_map)
-		print("Tunnel spawned at room center")
+		# Add the tunnel to the scene
+		tunnel_tile_map.add_child(area)
+		add_child(tunnel_tile_map)
 
+		print("Tunnel spawned at room center:", random_room_center)
 		tunnels_spawned += 1
+
 	
 func _spawn_random_items() -> void:
 	# Clear any existing items
 	var items = get_tree().get_nodes_in_group("item")
 	for item in items:
 		item.queue_free()
+		items.erase(item)
 	
 	# Spawn items in random rooms
 	var item_sceen = preload("res://Items/item.tscn")
@@ -375,7 +388,6 @@ func _spawn_spikes() -> void:
 	# Clear any existing spikes
 	var spikes = get_tree().get_nodes_in_group("spike")
 	for spike in spikes:
-		print("Clearing: ", spike)
 		spike.queue_free()
 
 	for i in get_spike_quantity():
@@ -396,19 +408,23 @@ func _spawn_spikes() -> void:
 func _spawn_ennemies() -> void:
 	# Clear any existing ennemies
 	for m in minotaurs:
-		print("clearing mino")
-		#m.player = null
 		m.destroy()
 		m.queue_free()
-
 		minotaurs.erase(m)
 		
 	minotaurs.clear()
 
 	var minotaur_scene = preload("res://Dongeon/Minotaur/minotaur.tscn")
+	var used_tiles = []
 	for i in get_minotaur_quantity():
 		var minotaur = minotaur_scene.instantiate()
 		var random_tile = room_data.keys()[randi() % room_data.size()]
+		
+		# Ensure the tile is not already used
+		while random_tile in used_tiles:
+			random_tile = room_data.keys()[randi() % room_data.size()]
+		
+		used_tiles.append(random_tile)
 		minotaur.global_position = random_tile * SCALE_FACTOR
 		minotaur.connect("mino_attack_player", Callable(self, "_on_minotaur_attack"))
 		minotaur.add_to_group("minotaur")
@@ -416,6 +432,8 @@ func _spawn_ennemies() -> void:
 		call_deferred("add_child", minotaur)
 
 		minotaurs.append(minotaur)
+		
+	print("Ennemies spawn done")
 		
 func _on_minotaur_attack(damage: int) -> void:
 	player.take_damage(damage)
@@ -482,8 +500,10 @@ func _go_next_level() -> void:
 		get_tree().quit()
 		return
 	
+	map_drawn = false
 	DongeonGlobal.current_level += 1
-	dongeon_setup()
+	get_tree().reload_current_scene()
+	#dongeon_setup()
 
 func _on_tunnel_entered(area: Area2D) -> void:
 	if area.is_in_group("player"):
@@ -525,8 +545,8 @@ func _player_death() -> void:
 	current_nbr_of_death += 1
 	
 	if current_nbr_of_death >= max_death_per_level:
-		get_tree().reload_current_scene()
 		DongeonGlobal.current_level = 0
+		get_tree().reload_current_scene()
 	else:
 		_spawn_player()
 		_update_uhd()
@@ -536,21 +556,17 @@ func _player_pressed_trap(is_activated: bool) -> void:
 		player.take_damage(10)
 		
 func dongeon_setup() -> void:
-	points_accumulated = 0
-	map_drawn = false
+	if map_drawn: return
+	map_drawn = true
 	
-	# Clear old tilemap
-	if tunnel_tile_map:
-		tunnel_tile_map.queue_free()
+	points_accumulated = 0
+	
+	# Clear old tilemap level
 	tile_map.clear()
 
 	# Generate dongeon shape
-	await _generate_dongeon_data()
-
-	#wait 10 sec
-	await get_tree().create_timer(10, true)
-
-	await _draw_terrains()
+	_generate_dongeon_data()
+	_draw_terrains()
 	_generate_occluders_collisions()
 	
 	# Spawn goodies
