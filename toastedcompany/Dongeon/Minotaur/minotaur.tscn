@@ -141,10 +141,9 @@ radius = 710.138
 radius = 300.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_peupa"]
-size = Vector2(49, 75)
+size = Vector2(105, 148)
 
 [node name="Minotaur" type="CharacterBody2D" groups=["minotaur"]]
-z_index = 10
 script = ExtResource("1_n7rsb")
 
 [node name="AnimationMinotaur" type="AnimationPlayer" parent="."]
@@ -192,8 +191,10 @@ shape = SubResource("CircleShape2D_7g1qf")
 debug_color = Color(0.975809, 0.109951, 0.282128, 0.42)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." groups=["minotaur"]]
-position = Vector2(-5.5, -15.5)
+position = Vector2(-6.5, -17)
 shape = SubResource("RectangleShape2D_peupa")
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
 
 [connection signal="animation_finished" from="AnimationMinotaur" to="StateMachine/Charge" method="_on_animation_minotaur_animation_finished"]
 [connection signal="animation_finished" from="AnimationMinotaur" to="StateMachine/Attack" method="_on_animation_minotaur_animation_finished"]

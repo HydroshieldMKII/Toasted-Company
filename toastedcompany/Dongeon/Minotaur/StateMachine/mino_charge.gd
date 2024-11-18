@@ -60,7 +60,7 @@ func handle_collision(collision: KinematicCollision2D):
 
 	# Make the minotaur bigger
 	var new_charge_area = minotaur.get_node("ChargeArea/CollisionShape2D").shape as CircleShape2D
-	if new_charge_area.radius <= 350:
+	if new_charge_area.radius <= 450:
 		new_charge_area.radius *= 1.1
 		minotaur.get_node("ChargeArea/CollisionShape2D").shape = new_charge_area
 
@@ -68,14 +68,21 @@ func handle_collision(collision: KinematicCollision2D):
 	if new_scale.x <= 2.5 and new_scale.y <= 2.5:
 		minotaur.get_node("CollisionShape2D").scale = new_scale
 
+	var new_taunt_area = minotaur.get_node("TauntArea/CollisionShape2D").shape as CircleShape2D
+	if new_taunt_area.radius <= 1000:
+		new_taunt_area.radius *= 1.15
+		minotaur.get_node("TauntArea/CollisionShape2D").shape = new_taunt_area
+
 	var new_sprite_scale = minotaur.sprite.scale * 1.1
 	if new_sprite_scale.x <= 8 and new_sprite_scale.y <= 8:
 		minotaur.sprite.scale = new_sprite_scale
 
 	# Handle transition based on collision
-	if collision.get_collider().name == 'Player' and not player.is_dead:
+	if player.is_dead:
+		Transitioned.emit(self, "Taunt")
+	elif collision.get_collider().name == 'Player':
 		Transitioned.emit(self, "Attack")
-	elif minotaur.get_node("ChargeArea").overlaps_body(player) and not player.is_dead:
+	elif minotaur.get_node("ChargeArea").overlaps_body(player):
 		Transitioned.emit(self, "Charge")
 	elif minotaur.get_node("TauntArea").overlaps_body(player):
 		Transitioned.emit(self, "Taunt")
@@ -85,13 +92,31 @@ func handle_collision(collision: KinematicCollision2D):
 	charging = false
 	target = null
 	pre_charge_count = 0
+	
 
 func _on_animation_minotaur_animation_finished(anim_name: StringName) -> void:
 	if anim_name == "pre_charge" and not charging:
 		if pre_charge_count < 3:
 			pre_charge_count += 1
 		else:
-			charging = true
+			#Check if player is in sight and can charge without hitting a wall
+			var ray = minotaur.get_node("RayCast2D") as RayCast2D
+			if ray:
+				ray.target_position = player.global_position - minotaur.global_position
+				ray.force_raycast_update()
+				
+			if ray.is_colliding() and ray.get_collider() == player:
+				target = (player.global_position - minotaur.global_position).normalized()
+				charging = true
+			else:
+				print("Mino can't charge, player is behind a wall")
+				pre_charge_count = 0
+				if minotaur.get_node("ChargeArea").overlaps_body(player):
+					Transitioned.emit(self, "Charge")
+				elif minotaur.get_node("TauntArea").overlaps_body(player):
+					Transitioned.emit(self, "Taunt")
+				else:
+					Transitioned.emit(self, "Idle")
 
 func _on_taunt_area_area_exited(area: Area2D) -> void:
 	if area.is_in_group("player") and not charging: # Cancel charge early

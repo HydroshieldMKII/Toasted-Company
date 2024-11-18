@@ -32,6 +32,7 @@ func update(delta: float) -> void:
 
 func physics_update(delta: float) -> void:
 	if player.is_dead:
+		player.direction = Vector2.ZERO
 		player.velocity = Vector2.ZERO
 		return
 	if (player.velocity.length() > 0):
