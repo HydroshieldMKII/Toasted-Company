@@ -32,6 +32,7 @@ var map_drawn = false
 var max_death_per_level = 3
 var current_nbr_of_death = 0
 var speed_negation_per_item = 40
+var ligth_negation_per_item = 2 #2 scale
 
 # Dynamic level configuration functions
 func get_item_quantity_room() -> int:
@@ -55,7 +56,7 @@ func get_rooms_max_per_level() -> int:
 	return round(15 + DongeonGlobal.current_level * 2)
 
 func get_corridor_width() -> int:
-	return round(16)
+	return round(32)
 
 func get_spike_quantity() -> int:
 	return round(30 + DongeonGlobal.current_level * 7.5)
@@ -115,6 +116,7 @@ func _update_uhd() -> void:
 	var hud = player.get_node("HUD")
 	var score_label = hud.get_node("Score")
 	score_label.text = "Missing points: " + str(get_points_per_level() - points_accumulated)
+	
 
 	var inventoryWarning = hud.get_node("InventoryWarning")
 	inventoryWarning.visible = false
@@ -435,7 +437,9 @@ func _spawn_player() -> void:
 			hud.get_node("ItemScore1").text = ""
 			hud.get_node("ItemScore2").text = ""
 			player.health = 100
-			player.get_node("StateMachine/Walk").move_speed = 200
+			player.is_dead = false
+			player.get_node("StateMachine/Walk").move_speed = 425.0
+			
 
 		# Choose a random room center
 		var random_room_center = room_center[randi() % room_center.size()]
@@ -443,8 +447,6 @@ func _spawn_player() -> void:
 		# Calculate the player position and instantiate the player
 		var player_position = random_room_center * SCALE_FACTOR
 		player.global_position = player_position
-		
-		print("Player spawn pos: ", player_position)
 		_update_uhd()
 
 func _on_player_collect_item(item_name: String, value: int) -> void:
@@ -461,11 +463,13 @@ func _on_player_collect_item(item_name: String, value: int) -> void:
 		item1.modulate = Color(1, 1, 1, 1)
 		hud.get_node("ItemScore1").text = str(value)
 		player.get_node("StateMachine/Walk").move_speed -= speed_negation_per_item
+		player.get_node("PointLight2D").texture_scale -= ligth_negation_per_item
 	else:
 		item2.texture = load("res://Assests/Items/" + item_name + ".png")
 		item2.modulate = Color(1, 1, 1, 1)
 		hud.get_node("ItemScore2").text = str(value)
 		player.get_node("StateMachine/Walk").move_speed -= (speed_negation_per_item + 10)
+		player.get_node("PointLight2D").texture_scale -= ligth_negation_per_item
 
 		var inventoryWarning = hud.get_node("InventoryWarning")
 		inventoryWarning.visible = true
@@ -490,9 +494,11 @@ func _on_tunnel_entered(area: Area2D) -> void:
 		if hud.get_node("ItemScore1").text != "":
 			item1_value = int(hud.get_node("ItemScore1").text)
 			player.get_node("StateMachine/Walk").move_speed += speed_negation_per_item
+			player.get_node("PointLight2D").texture_scale += ligth_negation_per_item
 		if hud.get_node("ItemScore2").text != "":
 			item2_value = int(hud.get_node("ItemScore2").text)
 			player.get_node("StateMachine/Walk").move_speed += speed_negation_per_item + 10
+			player.get_node("PointLight2D").texture_scale += ligth_negation_per_item
 
 		points_accumulated += (item1_value + item2_value)
 
@@ -521,6 +527,7 @@ func _player_death() -> void:
 		DongeonGlobal.current_level = 0
 	else:
 		_spawn_player()
+		_update_uhd()
 
 func _player_pressed_trap(is_activated: bool) -> void:
 	if is_activated:

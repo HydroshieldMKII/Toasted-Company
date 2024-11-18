@@ -14,8 +14,10 @@ func enter():
 	var rand_value = randi() % 100
 	if rand_value < (100 - minotaur.big_attack_chance):
 		anim_minotaur.play("small_attack")
+		mino_attack.emit(minotaur.base_attack_damage)
 	else:
 		anim_minotaur.play("big_attack")
+		mino_attack.emit(minotaur.big_attack_damage)
 	
 func update(delta: float) -> void:
 	pass
@@ -25,18 +27,10 @@ func physics_update(delta: float) -> void:
 
 
 func _on_animation_minotaur_animation_finished(anim_name: StringName) -> void:
-	if anim_name == "small_attack" or anim_name == "big_attack":
-		var damage
-		if anim_name == "small_attack":
-			damage = minotaur.base_attack_damage
+	if anim_name == "small_attack" or anim_name == "big_attack" and player:
+		if minotaur.get_node("ChargeArea").overlaps_body(player):
+			Transitioned.emit(self, "Charge")
+		elif minotaur.get_node("TauntArea").overlaps_body(player):
+			Transitioned.emit(self, "Taunt")
 		else:
-			damage = minotaur.big_attack_damage
-
-		mino_attack.emit(damage)
-		if player:
-			if minotaur.get_node("ChargeArea").overlaps_body(player):
-				Transitioned.emit(self, "Charge")
-			elif minotaur.get_node("TauntArea").overlaps_body(player):
-				Transitioned.emit(self, "Taunt")
-			else:
-				Transitioned.emit(self, "Idle")
+			Transitioned.emit(self, "Idle")

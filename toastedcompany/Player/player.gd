@@ -49,7 +49,6 @@ func check_health(delta: float):
 		is_dead = true
 		healthbar.value = 0
 		anim_player.play("die")
-		death_timer.start()
 
 	#Update health color
 	if health <= 30:
@@ -61,4 +60,10 @@ func check_health(delta: float):
 
 func _on_death_timer_timeout() -> void:
 	shader.set_shader_parameter("flash_modifier", 0)
+	healthbar.value = 100
 	player_respawn.emit()
+
+
+func _on_animation_player_animation_finished(anim_name: StringName) -> void:
+	if anim_name == "die":
+		death_timer.start()

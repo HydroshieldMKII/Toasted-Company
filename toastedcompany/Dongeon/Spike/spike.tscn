@@ -22,7 +22,7 @@ wait_time = 0.5
 one_shot = true
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-self_modulate = Color(0.815686, 0.815686, 0.815686, 0.847059)
+self_modulate = Color(0.404511, 0.404511, 0.404511, 0.847059)
 scale = Vector2(5, 5)
 texture = ExtResource("1_gic3g")
 
