@@ -7,8 +7,7 @@ var anim_minotaur: AnimationPlayer
 
 func enter():
 	anim_minotaur = minotaur.get_animation_minotaur()
-	if minotaur.get_parent():
-		player = minotaur.get_parent().get_node("Player")
+	player = get_tree().get_nodes_in_group("player")[0]
 		
 func update(delta: float) -> void:
 	#if minotaur.is_dead:
@@ -19,13 +18,14 @@ func update(delta: float) -> void:
 	
 func physics_update(delta: float) -> void:
 	if not anim_minotaur: return
-	#if minotaur.is_dead: return
+
 	anim_minotaur.play("taunt")
 	
-	if player.global_position.x < minotaur.global_position.x:
-		minotaur.sprite.flip_h = true
-	else:
-		minotaur.sprite.flip_h = false
+	if player:
+		if player.global_position.x < minotaur.global_position.x:
+			minotaur.sprite.flip_h = true
+		else:
+			minotaur.sprite.flip_h = false
 		
 func _on_charge_area_area_entered(area: Area2D) -> void:
 	print("Charge state switch")

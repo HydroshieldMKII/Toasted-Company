@@ -6,6 +6,7 @@ class_name Dongeon
 @export var spike_scene = preload("res://Dongeon/Spike/spike.tscn")
 var player: Player = null
 var splash: Splash = null
+var minotaurs: Array = []
 
 @onready var fog: CanvasModulate = $Fog
 
@@ -386,8 +387,10 @@ func _spawn_spikes() -> void:
 
 func _spawn_ennemies() -> void:
 	# Clear any existing ennemies
-	var existing_minotaurs = get_tree().get_nodes_in_group("minotaur")
-	for m in existing_minotaurs:
+	for m in minotaurs:
+		print("clearing mino")
+		m.player = null
+		m.destroy()
 		m.queue_free()
 
 	var minotaur_scene = preload("res://Dongeon/Minotaur/minotaur.tscn")
@@ -396,6 +399,8 @@ func _spawn_ennemies() -> void:
 		var random_tile = room_data.keys()[randi() % room_data.size()]
 		minotaur.global_position = random_tile * SCALE_FACTOR
 		minotaur.connect("mino_attack_player", Callable(self, "_on_minotaur_attack"))
+		minotaur.add_to_group("minotaur")
+		minotaur.player = player
 		call_deferred("add_child", minotaur)
 		
 func _on_minotaur_attack(damage: int) -> void:
@@ -517,13 +522,13 @@ func dongeon_setup() -> void:
 	# Spawn goodies
 	_spawn_random_items()
 	
-	# Spawn danger
-	_spawn_spikes()
-	_spawn_ennemies()
+	# Spawn the player
+	_spawn_player()
+	_update_uhd()
 	
 	# Spawn goodies endpoint
 	_spawn_random_tunnel()
 	
-	#Spawn the palyer
-	_spawn_player()
-	_update_uhd()
+	# Spawn danger
+	_spawn_spikes()
+	_spawn_ennemies()

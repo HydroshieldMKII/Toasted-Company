@@ -11,8 +11,7 @@ var target = null
 
 func enter():
 	anim_minotaur = minotaur.get_animation_minotaur()
-	if minotaur.get_parent():
-		player = minotaur.get_parent().get_node("Player")
+	player = get_tree().get_nodes_in_group("player")[0]
 
 func update(delta: float) -> void:
 	if not anim_minotaur:
@@ -23,10 +22,11 @@ func update(delta: float) -> void:
 	else:
 		anim_minotaur.play("pre_charge")
 
-		if player.global_position.x < minotaur.global_position.x:
-			minotaur.sprite.flip_h = true
-		else:
-			minotaur.sprite.flip_h = false
+		if player:
+			if player.global_position.x < minotaur.global_position.x:
+				minotaur.sprite.flip_h = true
+			else:
+				minotaur.sprite.flip_h = false
 
 func physics_update(delta: float) -> void:
 	if charging and not target:
@@ -39,6 +39,11 @@ func physics_update(delta: float) -> void:
 			charging = false
 			target = null
 			pre_charge_count = 0
+
+			# Increase the size of the ChargeArea each time the Minotaur charges
+			var charge_area = minotaur.get_node("ChargeArea/CollisionShape2D") as CollisionShape2D
+			var new_scale = charge_area.scale * 1.2
+			charge_area.scale = new_scale
 			
 			print("Mino collision")
 			# If collide with player, transition to attack state

@@ -3,6 +3,7 @@ class_name Minotaur
 
 signal mino_attack_player(damage: int)
 
+var player: Player
 var anim_minotaur: AnimationPlayer
 var sprite: Sprite2D
 var shader: ShaderMaterial
@@ -11,9 +12,10 @@ var is_dead = false
 	
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	#shader = sprite.material as ShaderMaterial
 	anim_minotaur = $AnimationMinotaur
 	sprite = $Sprite2D
-	#shader = sprite.material as ShaderMaterial
+	player = self.get_parent().get_node("Player")
 	anim_minotaur.play("idle")
 
 	$StateMachine/Attack.connect("mino_attack", Callable(self, "_on_mino_attack_player"))
@@ -28,3 +30,7 @@ func _process(delta: float) -> void:
 	
 func get_animation_minotaur() -> AnimationPlayer:
 	return anim_minotaur
+	
+func destroy() -> void:
+	player = null
+	queue_free()

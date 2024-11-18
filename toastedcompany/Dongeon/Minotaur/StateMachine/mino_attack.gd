@@ -10,7 +10,7 @@ var attack_damage
 
 func enter():
 	anim_minotaur = minotaur.get_animation_minotaur()
-	player = minotaur.get_parent().get_node("Player")
+	player = get_tree().get_nodes_in_group("player")[0]
 
 	if randi() % 2 == 0:
 		attack_damage = 10 # Small attack
