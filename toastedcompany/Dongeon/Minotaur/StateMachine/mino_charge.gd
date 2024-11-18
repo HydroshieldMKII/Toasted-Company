@@ -3,7 +3,6 @@ class_name MinoCharge
 
 @export var minotaur: Minotaur
 @export var player: CharacterBody2D # Reference to the player node
-@export var speed = 450 # Movement speed of the Minotaur
 var anim_minotaur: AnimationPlayer
 var pre_charge_count = 0
 var charging = false
@@ -34,16 +33,21 @@ func physics_update(delta: float) -> void:
 		target = (direction - minotaur.global_position).normalized()
 
 	if charging and target:
-		var collision = minotaur.move_and_collide(target * speed * delta)
+		var collision = minotaur.move_and_collide(target * minotaur.speed * delta)
 		if collision: # Charge into the player
 			charging = false
 			target = null
 			pre_charge_count = 0
 
-			# Increase the size of the ChargeArea each time the Minotaur charges
-			var charge_area = minotaur.get_node("ChargeArea/CollisionShape2D") as CollisionShape2D
-			var new_scale = charge_area.scale * 1.2
-			charge_area.scale = new_scale
+			# Scaling
+			minotaur.get_node("ChargeArea/CollisionShape2D").scale *= 1.1
+			minotaur.base_attack_damage *= 1.2
+			minotaur.big_attack_damage *= 1.1
+			minotaur.speed *= 1.1
+
+			# Make the sprite bigger
+			minotaur.sprite.scale *= 1.1
+			minotaur.get_node("CollisionShape2D").scale *= 1.1
 			
 			print("Mino collision")
 			# If collide with player, transition to attack state

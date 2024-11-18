@@ -31,6 +31,7 @@ var map_drawn = false
 
 var max_death_per_level = 3
 var current_nbr_of_death = 0
+var speed_negation_per_item = 40
 
 # Dynamic level configuration functions
 func get_item_quantity_room() -> int:
@@ -57,7 +58,7 @@ func get_corridor_width() -> int:
 	return round(16)
 
 func get_spike_quantity() -> int:
-	return round(20 + DongeonGlobal.current_level * 2)
+	return round(30 + DongeonGlobal.current_level * 7.5)
 
 func get_minotaur_quantity() -> int:
 	return round(1 + DongeonGlobal.current_level)
@@ -389,9 +390,13 @@ func _spawn_ennemies() -> void:
 	# Clear any existing ennemies
 	for m in minotaurs:
 		print("clearing mino")
-		m.player = null
+		#m.player = null
 		m.destroy()
 		m.queue_free()
+
+		minotaurs.erase(m)
+		
+	minotaurs.clear()
 
 	var minotaur_scene = preload("res://Dongeon/Minotaur/minotaur.tscn")
 	for i in get_minotaur_quantity():
@@ -402,6 +407,8 @@ func _spawn_ennemies() -> void:
 		minotaur.add_to_group("minotaur")
 		minotaur.player = player
 		call_deferred("add_child", minotaur)
+
+		minotaurs.append(minotaur)
 		
 func _on_minotaur_attack(damage: int) -> void:
 	player.take_damage(damage)
@@ -443,10 +450,12 @@ func _on_player_collect_item(item_name: String, value: int) -> void:
 		item1.texture = load("res://Assests/Items/" + item_name + ".png")
 		item1.modulate = Color(1, 1, 1, 1)
 		hud.get_node("ItemScore1").text = str(value)
+		player.get_node("StateMachine/Walk").move_speed -= speed_negation_per_item
 	else:
 		item2.texture = load("res://Assests/Items/" + item_name + ".png")
 		item2.modulate = Color(1, 1, 1, 1)
 		hud.get_node("ItemScore2").text = str(value)
+		player.get_node("StateMachine/Walk").move_speed -= (speed_negation_per_item + 10)
 
 		var inventoryWarning = hud.get_node("InventoryWarning")
 		inventoryWarning.visible = true
@@ -470,8 +479,10 @@ func _on_tunnel_entered(area: Area2D) -> void:
 
 		if hud.get_node("ItemScore1").text != "":
 			item1_value = int(hud.get_node("ItemScore1").text)
+			player.get_node("StateMachine/Walk").move_speed += speed_negation_per_item
 		if hud.get_node("ItemScore2").text != "":
 			item2_value = int(hud.get_node("ItemScore2").text)
+			player.get_node("StateMachine/Walk").move_speed += speed_negation_per_item + 10
 
 		points_accumulated += (item1_value + item2_value)
 

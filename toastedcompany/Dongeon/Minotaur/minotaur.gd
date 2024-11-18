@@ -7,6 +7,9 @@ var player: Player
 var anim_minotaur: AnimationPlayer
 var sprite: Sprite2D
 var shader: ShaderMaterial
+var base_attack_damage = 20
+var big_attack_damage = 35
+var speed = 400
 
 var is_dead = false
 	

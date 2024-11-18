@@ -6,17 +6,15 @@ signal mino_attack(damage: int)
 @export var minotaur: Minotaur
 @export var player: CharacterBody2D
 var anim_minotaur: AnimationPlayer
-var attack_damage
 
 func enter():
 	anim_minotaur = minotaur.get_animation_minotaur()
 	player = get_tree().get_nodes_in_group("player")[0]
 
-	if randi() % 2 == 0:
-		attack_damage = 10 # Small attack
+	var rand_value = randi() % 100
+	if rand_value < 60:
 		anim_minotaur.play("small_attack")
 	else:
-		attack_damage = 20 # Big attack
 		anim_minotaur.play("big_attack")
 	
 func update(delta: float) -> void:
@@ -28,7 +26,13 @@ func physics_update(delta: float) -> void:
 
 func _on_animation_minotaur_animation_finished(anim_name: StringName) -> void:
 	if anim_name == "small_attack" or anim_name == "big_attack":
-		mino_attack.emit(attack_damage)
+		var damage
+		if anim_name == "small_attack":
+			damage = minotaur.base_attack_damage
+		else:
+			damage = minotaur.big_attack_damage
+
+		mino_attack.emit(damage)
 
 		if minotaur.get_node("ChargeArea").overlaps_body(player):
 			Transitioned.emit(self, "Charge")

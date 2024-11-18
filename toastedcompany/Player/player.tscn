@@ -145,14 +145,6 @@ shader_parameter/flash_modifier = 0.0
 z_index = 10
 script = ExtResource("1_kww0b")
 
-[node name="DirectionalLight2D" type="DirectionalLight2D" parent="."]
-visible = false
-scale = Vector2(0.01, 0.01)
-energy = 3.0
-shadow_enabled = true
-height = 0.82
-max_distance = 1.0
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-0.5, 2)
 shape = SubResource("RectangleShape2D_aklre")
