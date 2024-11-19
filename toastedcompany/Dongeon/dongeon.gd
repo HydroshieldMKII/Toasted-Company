@@ -7,6 +7,7 @@ class_name Dongeon
 var player: Player = null
 var splash: Splash = null
 var minotaurs: Array = []
+var mages: Array = []
 var tunnels: Array = []
 
 @onready var fog: CanvasModulate = $Fog
@@ -61,7 +62,10 @@ func get_spike_quantity() -> int:
 	return round(30 + DongeonGlobal.current_level * 7.5)
 
 func get_minotaur_quantity() -> int:
-	return round(1 + DongeonGlobal.current_level)
+	return round(2 + DongeonGlobal.current_level * 2)
+
+func get_mage_quantity() -> int:
+	return round(4 + DongeonGlobal.current_level * 2)
 	
 func get_tunnel_quantity() -> int:
 	return round(1 + DongeonGlobal.current_level * 0.75)
@@ -359,7 +363,7 @@ func _spawn_random_items() -> void:
 		items.erase(item)
 	
 	# Spawn items in random rooms
-	var item_sceen = preload("res://Items/item.tscn")
+	var item_sceen = preload("res://Dongeon/Items/item.tscn")
 	var item = item_sceen.instantiate()
 
 	if room_center.size() > 0:
@@ -370,7 +374,7 @@ func _spawn_random_items() -> void:
 		_spawn_item(false)
 
 func _spawn_item(in_room: bool) -> void:
-	var item_scene = preload("res://Items/item.tscn")
+	var item_scene = preload("res://Dongeon/Items/item.tscn")
 	var item = item_scene.instantiate()
 	var random_tile
 
@@ -406,7 +410,7 @@ func _spawn_spikes() -> void:
 		spike.connect("trap_pressed", Callable(self, "_player_pressed_trap"))
 		call_deferred("add_child", spike)
 
-func _spawn_ennemies() -> void:
+func _spawn_minotaurs() -> void:
 	# Clear any existing ennemies
 	for m in minotaurs:
 		m.destroy()
@@ -435,6 +439,38 @@ func _spawn_ennemies() -> void:
 		minotaurs.append(minotaur)
 		
 	print("Ennemies spawn done")
+
+func _spawn_mages() -> void:
+	# Clear any existing ennemies
+	for m in mages:
+		m.destroy()
+		m.queue_free()
+		mages.erase(m)
+
+	var mage_scene = preload("res://Dongeon/Mage/mage.tscn")
+	var used_tiles = []
+	for i in get_mage_quantity():
+		var mage = mage_scene.instantiate()
+		var random_tile = room_data.keys()[randi() % room_data.size()]
+		
+		# Ensure the tile is not already used
+		while random_tile in used_tiles:
+			random_tile = room_data.keys()[randi() % room_data.size()]
+		
+		used_tiles.append(random_tile)
+		mage.global_position = random_tile * SCALE_FACTOR
+		mage.get_node("StateMachine/DeathRay").connect("mage_attack_done", Callable(self, "_on_mage_attack_done"))
+		mage.connect("mage_attack_player", Callable(self, "_on_mage_attack"))
+		mage.add_to_group("mage")
+		mage.player = player
+		call_deferred("add_child", mage)
+
+		mages.append(mage)
+		
+func _on_mage_attack_done(mage: Mage) -> void:
+	#relocate mage
+	var random_tile = room_data.keys()[randi() % room_data.size()]
+	mage.global_position = random_tile * SCALE_FACTOR
 		
 func _on_minotaur_attack(damage: int) -> void:
 	player.take_damage(damage)
@@ -543,7 +579,7 @@ func _on_tunnel_entered(area: Area2D) -> void:
 		hud.get_node("ItemScore2").text = ""
 
 func _player_death() -> void:
-	DongeonGlobal.current_lives	 -= 1
+	DongeonGlobal.current_lives -= 1
 	
 	if DongeonGlobal.current_lives == -1:
 		DongeonGlobal.current_level = 0
@@ -583,4 +619,5 @@ func dongeon_setup() -> void:
 	
 	# Spawn danger
 	_spawn_spikes()
-	_spawn_ennemies()
+	_spawn_minotaurs()
+	_spawn_mages()

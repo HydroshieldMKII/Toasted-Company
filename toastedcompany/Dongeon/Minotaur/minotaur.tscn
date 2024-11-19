@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://30kmhrwb66lv"]
+[gd_scene load_steps=20 format=3 uid="uid://30kmhrwb66lv"]
 
 [ext_resource type="Script" path="res://Dongeon/Minotaur/minotaur.gd" id="1_n7rsb"]
 [ext_resource type="Texture2D" uid="uid://cb6ahidfcfnvb" path="res://Assests/Minotaur.png" id="2_g7ldu"]
@@ -7,6 +7,9 @@
 [ext_resource type="Script" path="res://Dongeon/Minotaur/StateMachine/mino_taunt.gd" id="5_g3wsb"]
 [ext_resource type="Script" path="res://Dongeon/Minotaur/StateMachine/mino_charge.gd" id="6_xcpa7"]
 [ext_resource type="Script" path="res://Dongeon/Minotaur/StateMachine/mino_attack.gd" id="7_1eatq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_peupa"]
+size = Vector2(105, 148)
 
 [sub_resource type="Animation" id="Animation_yjdsg"]
 length = 0.001
@@ -140,11 +143,15 @@ radius = 710.138
 [sub_resource type="CircleShape2D" id="CircleShape2D_7g1qf"]
 radius = 300.0
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_peupa"]
-size = Vector2(105, 148)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a8rsh"]
+size = Vector2(106, 149)
 
 [node name="Minotaur" type="CharacterBody2D" groups=["minotaur"]]
 script = ExtResource("1_n7rsb")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." groups=["minotaur"]]
+position = Vector2(-6.5, -17)
+shape = SubResource("RectangleShape2D_peupa")
 
 [node name="AnimationMinotaur" type="AnimationPlayer" parent="."]
 libraries = {
@@ -190,11 +197,13 @@ debug_color = Color(0.508364, 0.572378, 0.243815, 0.42)
 shape = SubResource("CircleShape2D_7g1qf")
 debug_color = Color(0.975809, 0.109951, 0.282128, 0.42)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." groups=["minotaur"]]
-position = Vector2(-6.5, -17)
-shape = SubResource("RectangleShape2D_peupa")
-
 [node name="RayCast2D" type="RayCast2D" parent="."]
+
+[node name="CollisionDetection" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CollisionDetection"]
+position = Vector2(-6, -17.5)
+shape = SubResource("RectangleShape2D_a8rsh")
 
 [connection signal="animation_finished" from="AnimationMinotaur" to="StateMachine/Charge" method="_on_animation_minotaur_animation_finished"]
 [connection signal="animation_finished" from="AnimationMinotaur" to="StateMachine/Attack" method="_on_animation_minotaur_animation_finished"]

@@ -143,7 +143,6 @@ shader_parameter/flash_modifier = 0.0
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
 z_index = 10
-collision_layer = 5
 script = ExtResource("1_kww0b")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
