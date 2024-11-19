@@ -78,5 +78,7 @@ func _on_cast_delay_timeout() -> void:
 	
 	if mage.sprite.flip_h:
 		mage.cast_beam.scale.x = -1
+		mage.cast_beam.position.x = 300 # Sprite not centered
 	else:
 		mage.cast_beam.scale.x = 1
+		mage.cast_beam.position.x = 0

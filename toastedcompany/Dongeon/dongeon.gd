@@ -56,19 +56,19 @@ func get_rooms_max_per_level() -> int:
 	return round(15 + DongeonGlobal.current_level * 2)
 
 func get_corridor_width() -> int:
-	return round(24)
+	return round(48)
 
 func get_spike_quantity() -> int:
-	return round(30 + DongeonGlobal.current_level * 7.5)
+	return round(20 + DongeonGlobal.current_level * 7.5)
 
 func get_minotaur_quantity() -> int:
 	return round(2 + DongeonGlobal.current_level * 2)
 
 func get_mage_quantity() -> int:
-	return round(4 + DongeonGlobal.current_level * 2)
+	return round(6 + DongeonGlobal.current_level * 2)
 	
 func get_tunnel_quantity() -> int:
-	return round(1 + DongeonGlobal.current_level * 0.75)
+	return round(2 + DongeonGlobal.current_level * 0.75)
 	
 var points_accumulated = 0
 
