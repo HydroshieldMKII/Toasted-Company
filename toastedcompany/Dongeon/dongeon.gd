@@ -460,15 +460,16 @@ func _spawn_mages() -> void:
 		used_tiles.append(random_tile)
 		mage.global_position = random_tile * SCALE_FACTOR
 		mage.get_node("StateMachine/DeathRay").connect("mage_attack_done", Callable(self, "_on_mage_attack_done"))
-		mage.connect("mage_attack_player", Callable(self, "_on_mage_attack"))
+		mage.get_node("StateMachine/Idle").connect("mage_idle_timeout", Callable(self, "_on_mage_idle_timeout"))
 		mage.add_to_group("mage")
 		mage.player = player
 		call_deferred("add_child", mage)
 
 		mages.append(mage)
 		
-func _on_mage_attack_done(mage: Mage) -> void:
-	#relocate mage
+
+func _on_mage_idle_timeout(mage: Mage) -> void:
+	print("Mage idle relocation")
 	var random_tile = room_data.keys()[randi() % room_data.size()]
 	mage.global_position = random_tile * SCALE_FACTOR
 		

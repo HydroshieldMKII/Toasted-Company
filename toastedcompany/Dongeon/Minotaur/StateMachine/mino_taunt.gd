@@ -28,7 +28,6 @@ func physics_update(delta: float) -> void:
 			minotaur.sprite.flip_h = false
 		
 func _on_charge_area_area_entered(area: Area2D) -> void:
-	print("Charge state switch")
 	if area.is_in_group("player"):
 		Transitioned.emit(self, "Charge")
 

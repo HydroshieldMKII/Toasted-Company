@@ -7,6 +7,9 @@ var player: Player
 var anim_mage: AnimationPlayer
 var sprite: Sprite2D
 var shader: ShaderMaterial
+@onready var cast_delay: Timer = $CastDelay
+@onready var idle_delay: Timer = $IdleTimer
+@onready var cast_beam: RayCast2D = $CastBeam
 var base_attack_damage = 20
 var big_attack_damage = 35
 var big_attack_chance = 30 #in percent
