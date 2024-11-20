@@ -198,6 +198,7 @@ shape = SubResource("CircleShape2D_7g1qf")
 debug_color = Color(0.975809, 0.109951, 0.282128, 0.42)
 
 [node name="RayCast2D" type="RayCast2D" parent="."]
+collision_mask = 5
 
 [node name="CollisionDetection" type="Area2D" parent="."]
 

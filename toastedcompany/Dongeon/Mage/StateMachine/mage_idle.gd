@@ -22,10 +22,10 @@ func update(delta: float) -> void:
 		
 	if is_player_in_range and mage_is_spawn:
 		#Check if mage sees the player
-		mage.cast_beam.target_position = player.global_position - mage.global_position
-		mage.cast_beam.force_raycast_update()
+		mage.player_detector.target_position = player.global_position - mage.global_position
+		mage.player_detector.force_raycast_update()
 			
-		if mage.cast_beam.is_colliding() and mage.cast_beam.get_collider() == player:
+		if mage.player_detector.is_colliding() and mage.player_detector.get_collider() == player:
 			mage_is_spawn = false
 			mage.idle_delay.stop()
 			Transitioned.emit(self, "Deathray")

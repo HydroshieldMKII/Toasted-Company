@@ -6,23 +6,6 @@
 [ext_resource type="Script" path="res://Dongeon/Mage/StateMachine/mage_idle.gd" id="4_ojoqq"]
 [ext_resource type="Script" path="res://Dongeon/Mage/StateMachine/mage_death_ray.gd" id="5_6uenj"]
 
-[sub_resource type="Animation" id="Animation_cnofr"]
-resource_name = "idle"
-length = 0.9
-step = 0.0333
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.133333, 0.266667, 0.4, 0.533333, 0.666667, 0.8),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [0, 1, 2, 3, 4, 5, 6]
-}
-
 [sub_resource type="Animation" id="Animation_krghm"]
 length = 0.001
 tracks/0/type = "value"
@@ -64,6 +47,23 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
 "values": [Vector2i(0, 2), Vector2i(1, 2), Vector2i(2, 2), Vector2i(3, 2), Vector2i(4, 2), Vector2i(5, 2), Vector2i(6, 2), Vector2i(7, 2)]
+}
+
+[sub_resource type="Animation" id="Animation_cnofr"]
+resource_name = "idle"
+length = 0.9
+step = 0.0333
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.133333, 0.266667, 0.4, 0.533333, 0.666667, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6]
 }
 
 [sub_resource type="Animation" id="Animation_s20tm"]
@@ -157,9 +157,10 @@ shape = SubResource("CircleShape2D_efcxe")
 [node name="RayCast2D" type="RayCast2D" parent="."]
 
 [node name="CastBeam" type="RayCast2D" parent="."]
-position = Vector2(0, 12)
-enabled = false
-target_position = Vector2(469, 0)
+position = Vector2(105, 12)
+scale = Vector2(1, 25)
+target_position = Vector2(364, 0)
+hit_from_inside = true
 
 [node name="CastDelay" type="Timer" parent="."]
 process_callback = 0

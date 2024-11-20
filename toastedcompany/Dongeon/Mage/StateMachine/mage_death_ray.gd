@@ -6,6 +6,7 @@ var anim_mage: AnimationPlayer
 var is_casting = false
 var is_cast_done = false
 var player_got_it = false
+var random_direction
 
 signal mage_attack_done(mage: Mage)
 
@@ -23,13 +24,13 @@ func enter():
 		Vector2(-100, 0), # Left
 		Vector2(100, 0), # Right
 	]
-	var random_direction = directions[randi() % directions.size()]
+	random_direction = directions[randi() % directions.size()]
 	mage.global_position = mage.player.global_position + random_direction
 	
 	if random_direction.x > 0:
-		mage.sprite.flip_h = true
+		mage.scale = Vector2(-1, 1)
 	else:
-		mage.sprite.flip_h = false
+		mage.scale = Vector2(1, 1)
 	
 	anim_mage.play("teleport_in")
 	
@@ -45,7 +46,6 @@ func physics_update(delta: float) -> void:
 	
 	# Check raycast if player got hit by the ray
 	if is_casting and not player_got_it:
-		mage.cast_beam.force_raycast_update()
 		if mage.cast_beam.is_colliding() and mage.cast_beam.get_collider() == mage.player:
 			print("Player got hit by the ray")
 			player_got_it = true
@@ -56,14 +56,14 @@ func _on_animation_mage_animation_finished(anim_name: StringName) -> void:
 		# Delay beam activation
 		#mage.cast_delay.start()
 		is_casting = true
-		
-		if mage.sprite.flip_h:
-			mage.cast_beam.scale.x = -1
-		else:
-			mage.cast_beam.scale.x = 1
+		mage.cast_beam.force_raycast_update()
 	
 	if anim_name == "death_ray":
 		print("Death ray done")
+		if random_direction.x > 0:
+			mage.scale = Vector2(-1, 1)
+		else:
+			mage.scale = Vector2(1, 1)
 		is_cast_done = true
 		anim_mage.play("teleport_away")
 		
@@ -73,12 +73,4 @@ func _on_animation_mage_animation_finished(anim_name: StringName) -> void:
 
 func _on_cast_delay_timeout() -> void:
 	print("Death ray beam activated")
-	mage.cast_beam.enabled = true
 	is_casting = true
-	
-	if mage.sprite.flip_h:
-		mage.cast_beam.scale.x = -1
-		mage.cast_beam.position.x = 300 # Sprite not centered
-	else:
-		mage.cast_beam.scale.x = 1
-		mage.cast_beam.position.x = 0

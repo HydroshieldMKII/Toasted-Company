@@ -39,11 +39,6 @@ func physics_update(delta: float) -> void:
 		if collision:
 			handle_collision(collision)
 
-	#If charging, check for body overlap with player
-	if charging and minotaur.get_node("CollisionDetection").overlaps_body(player):
-		print("Mino contact!!")
-		Transitioned.emit(self, "Attack")
-
 func handle_collision(collision: KinematicCollision2D):
 	# Scaling abilities
 	minotaur.base_attack_damage *= 1.2
@@ -104,25 +99,24 @@ func _on_animation_minotaur_animation_finished(anim_name: StringName) -> void:
 		if pre_charge_count < 3:
 			pre_charge_count += 1
 		else:
-			charging = true
 			#Check if player is in sight and can charge without hitting a wall
-			# var ray = minotaur.get_node("RayCast2D") as RayCast2D
-			# if ray:
-			# 	ray.target_position = player.global_position - minotaur.global_position
-			# 	ray.force_raycast_update()
+			var ray = minotaur.get_node("RayCast2D") as RayCast2D
+			if ray:
+				ray.target_position = player.global_position - minotaur.global_position
+				ray.force_raycast_update()
 				
-			# if ray.is_colliding() and ray.get_collider() == player:
-			# 	target = (player.global_position - minotaur.global_position).normalized()
-			# 	charging = true
-			# else:
-			# 	print("Mino can't charge, player is behind a wall")
-			# 	pre_charge_count = 0
-			# 	if minotaur.get_node("ChargeArea").overlaps_body(player):
-			# 		Transitioned.emit(self, "Charge")
-			# 	elif minotaur.get_node("TauntArea").overlaps_body(player):
-			# 		Transitioned.emit(self, "Taunt")
-			# 	else:
-			# 		Transitioned.emit(self, "Idle")
+			if ray.is_colliding() and ray.get_collider() == player:
+				target = (player.global_position - minotaur.global_position).normalized()
+				charging = true
+			else:
+				print("Mino can't charge, player is behind a wall")
+				pre_charge_count = 0
+				if minotaur.get_node("ChargeArea").overlaps_body(player):
+					Transitioned.emit(self, "Charge")
+				elif minotaur.get_node("TauntArea").overlaps_body(player):
+					Transitioned.emit(self, "Taunt")
+				else:
+					Transitioned.emit(self, "Idle")
 
 func _on_taunt_area_area_exited(area: Area2D) -> void:
 	if area.is_in_group("player") and not charging: # Cancel charge early

@@ -540,7 +540,8 @@ func _go_next_level() -> void:
 	
 	map_drawn = false
 	DongeonGlobal.current_level += 1
-	get_tree().reload_current_scene()
+	get_tree().reload_current_scene() #@ _go_next_level(): Removing a CollisionObject node during a physics callback is not allowed and will cause undesired behavior. Remove with call_deferred() instead.
+
 	#dongeon_setup()
 
 func _on_tunnel_entered(area: Area2D) -> void:

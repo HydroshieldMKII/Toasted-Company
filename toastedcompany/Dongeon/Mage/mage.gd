@@ -10,6 +10,7 @@ var shader: ShaderMaterial
 @onready var cast_delay: Timer = $CastDelay
 @onready var idle_delay: Timer = $IdleTimer
 @onready var cast_beam: RayCast2D = $CastBeam
+@onready var player_detector: RayCast2D = $RayCast2D
 var base_attack_damage = 20
 var big_attack_damage = 35
 var big_attack_chance = 30 #in percent
