@@ -2,7 +2,7 @@ extends Node
 class_name DongeonGlob
 
 var player_can_move = true
-var current_level = 0
+var current_level = 20
 var current_lives = 3
 
 # Called when the node enters the scene tree for the first time.

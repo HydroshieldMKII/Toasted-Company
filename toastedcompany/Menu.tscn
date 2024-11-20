@@ -27,14 +27,20 @@ grow_vertical = 2
 
 [node name="StartBtn" type="Button" parent="VBoxContainer"]
 layout_mode = 2
+focus_neighbor_top = NodePath("../ExitBtn")
+focus_neighbor_bottom = NodePath("../OptionsBtn")
 text = "START"
 
 [node name="OptionsBtn" type="Button" parent="VBoxContainer"]
 layout_mode = 2
+focus_neighbor_top = NodePath("../StartBtn")
+focus_neighbor_bottom = NodePath("../ExitBtn")
 text = "OPTIONS"
 
 [node name="ExitBtn" type="Button" parent="VBoxContainer"]
 layout_mode = 2
+focus_neighbor_top = NodePath("../OptionsBtn")
+focus_neighbor_bottom = NodePath("../StartBtn")
 text = "EXIT GAME"
 
 [connection signal="pressed" from="VBoxContainer/StartBtn" to="." method="_on_start_btn_pressed"]

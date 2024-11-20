@@ -229,6 +229,8 @@ func _generate_occluders_collisions() -> void:
 
 func _create_wall(x, y, direction) -> void:
 	var body = StaticBody2D.new()
+	body.collision_layer = 1
+	body.collision_mask = 1
 	var polygon_shape = CollisionPolygon2D.new()
 	var points = PackedVector2Array()
 
@@ -533,10 +535,10 @@ func _on_player_collect_item(item_name: String, value: int) -> void:
 		inventoryWarning.visible = true
 
 func _go_next_level() -> void:
-	if DongeonGlobal.current_level == 9:
-		print("Game completed!")
-		get_tree().quit()
-		return
+	#if DongeonGlobal.current_level == 9:
+		#print("Game completed!")
+		#get_tree().quit()
+		#return
 	
 	map_drawn = false
 	DongeonGlobal.current_level += 1
