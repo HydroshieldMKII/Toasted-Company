@@ -2,10 +2,8 @@ extends Node2D
 class_name Dongeon
 
 @export var player_scene := preload("res://Player/player.tscn") # Preload the player scene
-@export var splash_scene := preload("res://SplashScreens/splashscreen.tscn")
 @export var spike_scene = preload("res://Dongeon/Spike/spike.tscn")
 var player: Player = null
-var splash: Splash = null
 var minotaurs: Array = []
 var mages: Array = []
 var tunnels: Array = []
@@ -598,12 +596,19 @@ func _player_death() -> void:
 	DongeonGlobal.current_lives -= 1
 	
 	if DongeonGlobal.current_lives == -1:
+		print("Game over!")
+		# No more lives
 		DongeonGlobal.current_level = 0
 		DongeonGlobal.current_lives = 3
-		get_tree().reload_current_scene()
+		saveProgress()
+		get_tree().change_scene_to_file("res://SplashScreens/Death/splashscreen.tscn")
 	else:
 		_spawn_player()
 		_update_uhd()
+		
+func saveProgress() -> void:
+	print("Saving progress")
+	pass
 
 func _player_pressed_trap(is_activated: bool) -> void:
 	if is_activated:

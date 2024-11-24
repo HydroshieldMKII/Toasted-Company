@@ -3,8 +3,9 @@ class_name DongeonGlob
 
 var player_can_move = true
 var current_level = 0
-var current_lives = 3
-var brightness = 1
+var current_lives = 0
+
+var brightness = 1 #Intensity on player
 var insane_mode = false
 
 # Called when the node enters the scene tree for the first time.

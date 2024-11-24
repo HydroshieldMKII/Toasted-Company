@@ -15,6 +15,7 @@ func _ready() -> void:
 	start_btn.grab_focus()
 
 func _on_start_btn_pressed() -> void:
+	DongeonGlobal.insane_mode = false
 	get_tree().change_scene_to_file("res://World/world.tscn")
 	
 	
