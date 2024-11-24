@@ -6,17 +6,19 @@ var flash_counter: int
 var flash_value: int = 0
 var timer_timout_executed = true
 
+@onready var light_intensity: PointLight2D = $PointLight2D
 @onready var death_timer: Timer = $DeathTimer
 @onready var spawn_protection_time = $SpawnProtection
 @onready var regen_timer = $HealthRegen
 
-@export var is_dead = false
 var health = 100
+@export var is_dead = false
 @onready var healthbar = $Healthbar
 
 signal player_respawn
 
 func _ready() -> void:
+	light_intensity.energy = DongeonGlobal.brightness
 	healthbar.value = 100
 	anim_player = $AnimationPlayer
 	sprite = $Sprite
@@ -49,7 +51,7 @@ func check_health(delta: float):
 	if health <= 0 and not is_dead:
 		print("Player died")
 		is_dead = true
-		healthbar.value = 0
+		#healthbar.value = 0
 		anim_player.play("die")
 
 	#Update health color
@@ -61,19 +63,18 @@ func check_health(delta: float):
 		healthbar.modulate = Color(0, 1, 0)
 
 func _on_death_timer_timeout() -> void:
+	flash_counter = 0
 	shader.set_shader_parameter("flash_modifier", 0)
 	healthbar.value = 100
 	spawn_protection_time.start()
 	player_respawn.emit()
 
-
 func _on_animation_player_animation_finished(anim_name: StringName) -> void:
 	if anim_name == "die":
 		death_timer.start()
 
-
 func _on_health_regen_timeout() -> void:
-	if health < 100:
+	if health < 100 and not is_dead:
 		health += 5
 		if health > 100:
 			health = 100

@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://cm7kwcphuplnw"]
+[gd_scene load_steps=4 format=3 uid="uid://cm7kwcphuplnw"]
 
 [ext_resource type="Script" path="res://menu.gd" id="1_hxy72"]
+[ext_resource type="Script" path="res://how_to_play.gd" id="2_alcwk"]
+[ext_resource type="Script" path="res://settings.gd" id="2_mvjff"]
 
 [node name="Menu" type="Control"]
 layout_mode = 3
@@ -9,9 +11,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+focus_mode = 2
 script = ExtResource("1_hxy72")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="Menu" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -25,24 +28,168 @@ offset_bottom = 50.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="StartBtn" type="Button" parent="VBoxContainer"]
+[node name="StartBtn" type="Button" parent="Menu"]
 layout_mode = 2
 focus_neighbor_top = NodePath("../ExitBtn")
-focus_neighbor_bottom = NodePath("../OptionsBtn")
-text = "START"
+focus_neighbor_bottom = NodePath("../InsaneBtn")
+text = "START NORMAL"
 
-[node name="OptionsBtn" type="Button" parent="VBoxContainer"]
+[node name="InsaneBtn" type="Button" parent="Menu"]
 layout_mode = 2
 focus_neighbor_top = NodePath("../StartBtn")
-focus_neighbor_bottom = NodePath("../ExitBtn")
+focus_neighbor_bottom = NodePath("../OptionsBtn")
+theme_override_colors/font_focus_color = Color(0.988235, 0, 0, 1)
+text = "START INSANE"
+
+[node name="OptionsBtn" type="Button" parent="Menu"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../InsaneBtn")
+focus_neighbor_bottom = NodePath("../HowBtn")
 text = "OPTIONS"
 
-[node name="ExitBtn" type="Button" parent="VBoxContainer"]
+[node name="HowBtn" type="Button" parent="Menu"]
 layout_mode = 2
 focus_neighbor_top = NodePath("../OptionsBtn")
+focus_neighbor_bottom = NodePath("../ExitBtn")
+text = "HOW TO PLAY"
+
+[node name="ExitBtn" type="Button" parent="Menu"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../HowBtn")
 focus_neighbor_bottom = NodePath("../StartBtn")
+theme_override_colors/font_focus_color = Color(0.788235, 0.792157, 0, 1)
 text = "EXIT GAME"
 
-[connection signal="pressed" from="VBoxContainer/StartBtn" to="." method="_on_start_btn_pressed"]
-[connection signal="pressed" from="VBoxContainer/OptionsBtn" to="." method="_on_options_btn_pressed"]
-[connection signal="pressed" from="VBoxContainer/ExitBtn" to="." method="_on_exit_btn_pressed"]
+[node name="HowToPlay" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -82.0
+offset_right = 82.0
+offset_bottom = 158.0
+grow_horizontal = 2
+alignment = 1
+script = ExtResource("2_alcwk")
+
+[node name="Label" type="Label" parent="HowToPlay"]
+layout_mode = 2
+text = "
+
+
+The rules are simples
+
+
+
+
+
+
+
+
+
+
+
+
+Press \"A\" to continue"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HowToPlay/Label"]
+layout_mode = 2
+offset_left = -155.0
+offset_top = 146.0
+offset_right = 518.0
+offset_bottom = 362.0
+
+[node name="Label" type="Label" parent="HowToPlay/Label/VBoxContainer"]
+layout_mode = 2
+text = "- Objective: Collect items and drop them at a trap
+
+-Danger: There are a few trap and ennemie to avoid to get to a trap
+
+- Lives: You have 3, after you loose and restart from the beginning
+
+- Go as far as you can!"
+
+[node name="Settings" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -148.0
+offset_top = -33.0
+offset_right = 163.0
+offset_bottom = 162.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_mvjff")
+
+[node name="Brightness_value" type="Label" parent="Settings"]
+layout_mode = 2
+text = "Brightness = 1"
+
+[node name="HSlider" type="HSlider" parent="Settings"]
+layout_mode = 2
+min_value = 0.5
+max_value = 1.5
+step = 0.05
+value = 1.0
+tick_count = 25
+ticks_on_borders = true
+
+[node name="Spacer" type="Label" parent="Settings"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Settings"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="Settings"]
+layout_mode = 2
+text = "
+Press \"A\" to continue"
+horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 421.0
+offset_top = 513.0
+offset_right = 595.0
+offset_bottom = 536.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 215.0
+offset_top = 503.0
+offset_right = 1068.0
+offset_bottom = 547.0
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="HS_Normal" type="Label" parent="HBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Highest score (Normal): 1000"
+
+[node name="HBoxContainer" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+text = "                                                                                                   "
+
+[node name="VBoxContainer" type="HBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="HS_Insane" type="Label" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+text = "Highest score (Insane): 9999
+"
+
+[connection signal="pressed" from="Menu/StartBtn" to="." method="_on_start_btn_pressed"]
+[connection signal="pressed" from="Menu/InsaneBtn" to="." method="_on_insane_btn_pressed"]
+[connection signal="pressed" from="Menu/OptionsBtn" to="." method="_on_options_btn_pressed"]
+[connection signal="pressed" from="Menu/HowBtn" to="." method="_on_how_btn_pressed"]
+[connection signal="pressed" from="Menu/ExitBtn" to="." method="_on_exit_btn_pressed"]
+[connection signal="changed" from="Settings/HSlider" to="Settings" method="_on_h_slider_changed"]
+[connection signal="value_changed" from="Settings/HSlider" to="Settings" method="_on_h_slider_value_changed"]

@@ -147,6 +147,7 @@ radius = 300.0
 size = Vector2(106, 149)
 
 [node name="Minotaur" type="CharacterBody2D" groups=["minotaur"]]
+z_index = 30
 collision_layer = 2
 script = ExtResource("1_n7rsb")
 

@@ -20,6 +20,7 @@ z_index = 25
 shape = SubResource("RectangleShape2D_0j2g0")
 
 [node name="Label" type="Label" parent="."]
+z_index = 30
 offset_left = -56.0
 offset_top = 28.0
 offset_right = -18.0

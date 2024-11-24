@@ -40,17 +40,17 @@ func physics_update(delta: float) -> void:
 			handle_collision(collision)
 
 func handle_collision(collision: KinematicCollision2D):
-	# Scaling abilities
+	# Scaling abilities with DungeonGlobal.insane_mode
 	minotaur.base_attack_damage *= 1.2
-	if minotaur.base_attack_damage > 100:
+	if not DongeonGlobal.insane_mode and minotaur.base_attack_damage > 100:
 		minotaur.base_attack_damage = 100
 
 	minotaur.big_attack_damage *= 1.1
-	if minotaur.big_attack_damage > 200:
+	if not DongeonGlobal.insane_mode and minotaur.big_attack_damage > 200:
 		minotaur.big_attack_damage = 200
 
 	minotaur.speed *= 1.1
-	if minotaur.speed > 700:
+	if not DongeonGlobal.insane_mode and minotaur.speed > 700:
 		minotaur.speed = 700
 
 	# Increase the chance of big attack
@@ -60,21 +60,21 @@ func handle_collision(collision: KinematicCollision2D):
 
 	# Make the minotaur bigger
 	var new_charge_area = minotaur.get_node("ChargeArea/CollisionShape2D").shape as CircleShape2D
-	if new_charge_area.radius <= 450:
+	if DongeonGlobal.insane_mode or new_charge_area.radius <= 450:
 		new_charge_area.radius *= 1.1
 		minotaur.get_node("ChargeArea/CollisionShape2D").shape = new_charge_area
 
 	var new_scale = minotaur.get_node("CollisionShape2D").scale * 1.1
-	if new_scale.x <= 2.5 and new_scale.y <= 2.5:
+	if DongeonGlobal.insane_mode or (new_scale.x <= 2.5 and new_scale.y <= 2.5):
 		minotaur.get_node("CollisionShape2D").scale = new_scale
 
 	var new_taunt_area = minotaur.get_node("TauntArea/CollisionShape2D").shape as CircleShape2D
-	if new_taunt_area.radius <= 1000:
+	if DongeonGlobal.insane_mode or new_taunt_area.radius <= 1000:
 		new_taunt_area.radius *= 1.15
 		minotaur.get_node("TauntArea/CollisionShape2D").shape = new_taunt_area
 
 	var new_sprite_scale = minotaur.sprite.scale * 1.1
-	if new_sprite_scale.x <= 8 and new_sprite_scale.y <= 8:
+	if DongeonGlobal.insane_mode or (new_sprite_scale.x <= 8 and new_sprite_scale.y <= 8):
 		minotaur.sprite.scale = new_sprite_scale
 
 	# Handle transition based on collision
@@ -92,11 +92,11 @@ func handle_collision(collision: KinematicCollision2D):
 	charging = false
 	target = null
 	pre_charge_count = 0
-	
 
+	
 func _on_animation_minotaur_animation_finished(anim_name: StringName) -> void:
 	if anim_name == "pre_charge" and not charging:
-		if pre_charge_count < 3:
+		if pre_charge_count < 3 or (DongeonGlobal.insane_mode and pre_charge_count < 2):
 			pre_charge_count += 1
 		else:
 			#Check if player is in sight and can charge without hitting a wall

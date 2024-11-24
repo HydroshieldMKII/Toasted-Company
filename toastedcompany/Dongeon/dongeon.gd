@@ -42,10 +42,13 @@ func get_item_quantity_corridor() -> int:
 	return round(1 + DongeonGlobal.current_level)
 
 func get_respawn_quantity() -> int:
-	return round(1 + DongeonGlobal.current_level * 1.5)
+	return round(2 + DongeonGlobal.current_level * 3.66)
 
 func get_points_per_level() -> int:
-	return round(100 + 200 * pow(DongeonGlobal.current_level, 1.2))
+	if DongeonGlobal.insane_mode:
+		return round(100 + 200 * pow(DongeonGlobal.current_level, 2))
+	else:
+		return round(100 + 200 * pow(DongeonGlobal.current_level, 1.2))
 
 func get_dongeon_size() -> Vector2:
 	var base_size = Vector2(1000, 750) # Starting dungeon size
@@ -59,13 +62,22 @@ func get_corridor_width() -> int:
 	return round(48)
 
 func get_spike_quantity() -> int:
-	return round(20 + DongeonGlobal.current_level * 7.5)
+	if DongeonGlobal.insane_mode:
+		return round(20 + DongeonGlobal.current_level * 12)
+	else:
+		return round(10 + DongeonGlobal.current_level * 5)
 
 func get_minotaur_quantity() -> int:
-	return round(2 + DongeonGlobal.current_level * 2)
+	if DongeonGlobal.insane_mode:
+		return round(6 + DongeonGlobal.current_level * 5)
+	else:
+		return round(2 + DongeonGlobal.current_level * 2)
 
 func get_mage_quantity() -> int:
-	return round(6 + DongeonGlobal.current_level * 2)
+	if DongeonGlobal.insane_mode:
+		return round(16 + DongeonGlobal.current_level * 6)
+	else:
+		return round(6 + DongeonGlobal.current_level * 2)
 	
 func get_tunnel_quantity() -> int:
 	return round(2 + DongeonGlobal.current_level * 0.75)
@@ -542,7 +554,7 @@ func _go_next_level() -> void:
 	
 	map_drawn = false
 	DongeonGlobal.current_level += 1
-	get_tree().reload_current_scene() #@ _go_next_level(): Removing a CollisionObject node during a physics callback is not allowed and will cause undesired behavior. Remove with call_deferred() instead.
+	get_tree().reload_current_scene() # @ _go_next_level(): Removing a CollisionObject node during a physics callback is not allowed and will cause undesired behavior. Remove with call_deferred() instead.
 
 	#dongeon_setup()
 
@@ -595,7 +607,10 @@ func _player_death() -> void:
 
 func _player_pressed_trap(is_activated: bool) -> void:
 	if is_activated:
-		player.take_damage(10)
+		if DongeonGlobal.insane_mode:
+			player.take_damage(10 + DongeonGlobal.current_level * 10)
+		else:
+			player.take_damage(10)
 		
 func dongeon_setup() -> void:
 	if map_drawn: return

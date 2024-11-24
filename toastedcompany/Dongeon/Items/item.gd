@@ -6,11 +6,17 @@ var value = 0
 @onready var label = $Label
 
 func get_item_min_value() -> int:
-	return 0 + DongeonGlobal.current_level * 5
+	if DongeonGlobal.insane_mode:
+		return 20 + DongeonGlobal.current_level * 20
+	else:
+		return 0 + DongeonGlobal.current_level * 5
 	
 	
 func get_item_max_value() -> int:
-	return 60 + DongeonGlobal.current_level * 20
+	if DongeonGlobal.insane_mode:
+		return 100 + DongeonGlobal.current_level * 40
+	else:
+		return 60 + DongeonGlobal.current_level * 20
 
 signal item_collected
 

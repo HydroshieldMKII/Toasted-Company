@@ -14,10 +14,16 @@ func enter():
 	var rand_value = randi() % 100
 	if rand_value < (100 - minotaur.big_attack_chance):
 		anim_minotaur.play("small_attack")
-		mino_attack.emit(minotaur.base_attack_damage)
+		if DongeonGlobal.insane_mode:
+			mino_attack.emit(minotaur.base_attack_damage * 1.5)
+		else:
+			mino_attack.emit(minotaur.base_attack_damage)
 	else:
 		anim_minotaur.play("big_attack")
-		mino_attack.emit(minotaur.big_attack_damage)
+		if DongeonGlobal.insane_mode:
+			mino_attack.emit(minotaur.big_attack_damage * 1.5)
+		else:
+			mino_attack.emit(minotaur.big_attack_damage)
 	
 func update(delta: float) -> void:
 	pass

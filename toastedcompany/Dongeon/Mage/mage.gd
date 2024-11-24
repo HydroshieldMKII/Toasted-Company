@@ -12,9 +12,6 @@ var shader: ShaderMaterial
 @onready var cast_beam: RayCast2D = $CastBeam
 @onready var player_detector: RayCast2D = $RayCast2D
 var base_attack_damage = 20
-var big_attack_damage = 35
-var big_attack_chance = 30 #in percent
-var speed = 400
 
 var is_dead = false
 	
@@ -29,7 +26,6 @@ func _ready() -> void:
 	#$StateMachine/Attack.connect("mage_attack", Callable(self, "_on_mage_attack_player"))
 
 func _on_mage_attack_player(damage: int) -> void:
-	print("Mage attack player")
 	emit_signal("mage_attack_player", damage)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

@@ -47,9 +47,11 @@ func physics_update(delta: float) -> void:
 	# Check raycast if player got hit by the ray
 	if is_casting and not player_got_it:
 		if mage.cast_beam.is_colliding() and mage.cast_beam.get_collider() == mage.player:
-			print("Player got hit by the ray")
 			player_got_it = true
-			mage.player.take_damage(20)
+			if DongeonGlobal.insane_mode:
+				mage.player.take_damage(mage.base_attack_damage * 1.5)
+			else:
+				mage.player.take_damage(mage.base_attack_damage)
 		
 func _on_animation_mage_animation_finished(anim_name: StringName) -> void:
 	if anim_name == "teleport_in":
@@ -59,7 +61,6 @@ func _on_animation_mage_animation_finished(anim_name: StringName) -> void:
 		mage.cast_beam.force_raycast_update()
 	
 	if anim_name == "death_ray":
-		print("Death ray done")
 		if random_direction.x > 0:
 			mage.scale = Vector2(-1, 1)
 		else:
@@ -72,5 +73,4 @@ func _on_animation_mage_animation_finished(anim_name: StringName) -> void:
 		Transitioned.emit(self, "Idle")
 
 func _on_cast_delay_timeout() -> void:
-	print("Death ray beam activated")
 	is_casting = true

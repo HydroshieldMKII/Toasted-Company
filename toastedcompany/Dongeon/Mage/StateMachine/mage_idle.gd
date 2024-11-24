@@ -39,7 +39,6 @@ func _on_animation_mage_animation_finished(anim_name: StringName) -> void:
 	if anim_name == "teleport_in":
 		mage_is_spawn = true
 	if anim_name == "teleport_away":
-		print("Tp away done")
 		mage_idle_timeout.emit(mage)
 		anim_mage.play("teleport_in")
 
@@ -52,6 +51,5 @@ func _on_cast_detection_area_exited(area: Area2D) -> void:
 		is_player_in_range = false
 
 func _on_idle_timer_timeout() -> void:
-	print("Idle timeout")
 	mage_is_spawn = false
 	anim_mage.play("teleport_away")
