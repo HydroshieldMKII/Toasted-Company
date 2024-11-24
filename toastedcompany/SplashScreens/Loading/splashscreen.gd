@@ -1,19 +1,23 @@
 extends CanvasLayer
 
-# Called when the node enters the scene tree for the first time.
+const target_scene_path = "res://Dongeon/dongeon.tscn"
+
+var loading_status : int
+var progress : Array[float]
+
 func _ready() -> void:
-	pass
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
-func _on_try_again_pressed() -> void:
-	# Get dongeon scene and reload it while closing the current scene
-	get_tree().change_scene_to_file("res://Dongeon/dongeon.tscn")
+	# Request to load the target scene:
+	ResourceLoader.load_threaded_request(target_scene_path)
 	
-func _on_main_menu_pressed() -> void:
-	get_tree().change_scene_to_file("res://Menu.tscn")
-
-func _on_exit_pressed() -> void:
-	get_tree().quit()
+func _process(_delta: float) -> void:
+	# Update the status:
+	loading_status = ResourceLoader.load_threaded_get_status(target_scene_path, progress)
+	
+	# Check the loading status:
+	match loading_status:
+		ResourceLoader.THREAD_LOAD_LOADED:
+			# When done loading, change to the target scene:
+			get_tree().change_scene_to_packed(ResourceLoader.load_threaded_get(target_scene_path))
+		ResourceLoader.THREAD_LOAD_FAILED:
+			# Well some error happend:
+			print("Error. Could not load Resource")

@@ -16,7 +16,7 @@ func _ready() -> void:
 
 func _on_start_btn_pressed() -> void:
 	DongeonGlobal.insane_mode = false
-	get_tree().change_scene_to_file("res://World/world.tscn")
+	get_tree().change_scene_to_file("res://SplashScreens/Loading/splashscreen.tscn")
 	
 	
 func _on_insane_btn_pressed() -> void:

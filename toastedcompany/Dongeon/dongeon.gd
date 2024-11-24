@@ -9,10 +9,7 @@ var minotaurs: Array = []
 var mages: Array = []
 var tunnels: Array = []
 
-@onready var loading_screen: CanvasLayer = $Splashscreen
 @onready var fog: CanvasModulate = $Fog
-
-# TileMapLayer
 @onready var tile_map := $Level
 
 # Generation data
@@ -85,10 +82,7 @@ func get_tunnel_quantity() -> int:
 var points_accumulated = 0
 
 func _ready() -> void:
-	# Display loading screen
-	print("Creating dongeon...")
 	dongeon_setup()
-	print("Dongeon created!")
 		
 func _process(delta: float) -> void:
 	_manage_input() # for debug
@@ -548,17 +542,12 @@ func _on_player_collect_item(item_name: String, value: int) -> void:
 		var inventoryWarning = hud.get_node("InventoryWarning")
 		inventoryWarning.visible = true
 
-func _go_next_level() -> void:
-	#if DongeonGlobal.current_level == 9:
-		#print("Game completed!")
-		#get_tree().quit()
-		#return
-	
+func _go_next_level() -> void:	
 	map_drawn = false
 	DongeonGlobal.current_level += 1
-	get_tree().reload_current_scene() # @ _go_next_level(): Removing a CollisionObject node during a physics callback is not allowed and will cause undesired behavior. Remove with call_deferred() instead.
-
-	#dongeon_setup()
+	
+	get_tree().change_scene_to_file("res://SplashScreens/Loading/splashscreen.tscn")
+	#get_tree().reload_current_scene() # @ _go_next_level(): Removing a CollisionObject node during a physics callback is not allowed and will cause undesired behavior. Remove with call_deferred() instead.
 
 func _on_tunnel_entered(area: Area2D) -> void:
 	if area.is_in_group("player"):
