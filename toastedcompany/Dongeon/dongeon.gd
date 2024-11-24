@@ -3,11 +3,13 @@ class_name Dongeon
 
 @export var player_scene := preload("res://Player/player.tscn") # Preload the player scene
 @export var spike_scene = preload("res://Dongeon/Spike/spike.tscn")
+
 var player: Player = null
 var minotaurs: Array = []
 var mages: Array = []
 var tunnels: Array = []
 
+@onready var loading_screen: CanvasLayer = $Splashscreen
 @onready var fog: CanvasModulate = $Fog
 
 # TileMapLayer
@@ -83,14 +85,16 @@ func get_tunnel_quantity() -> int:
 var points_accumulated = 0
 
 func _ready() -> void:
+	# Display loading screen
+	print("Creating dongeon...")
 	dongeon_setup()
+	print("Dongeon created!")
 		
 func _process(delta: float) -> void:
-	_manage_input()
+	_manage_input() # for debug
 	pass
 
 # Debug functions
-
 func _manage_input() -> void:
 	if player == null:
 		return

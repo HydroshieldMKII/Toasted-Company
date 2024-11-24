@@ -7,11 +7,12 @@ extends CanvasLayer
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	try_again_btn.grab_focus()
 	if DongeonGlobal.insane_mode:
 		try_other_btn.text = "Try Insane Mode"
 	else:
 		try_other_btn.text = "Try Normal Mode"
+		
+	try_again_btn.grab_focus()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -26,7 +27,6 @@ func _on_try_other_pressed() -> void:
 
 func _on_main_menu_pressed() -> void:
 	get_tree().change_scene_to_file("res://Menu.tscn")
-
 
 func _on_exit_pressed() -> void:
 	get_tree().quit()

@@ -18,7 +18,7 @@ layout_mode = 2
 [node name="Label" type="Label" parent="PanelContainer/MarginContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
-text = "Loading level
+text = "Loading level. PlEASE WAIT
 "
 horizontal_alignment = 1
 vertical_alignment = 1
