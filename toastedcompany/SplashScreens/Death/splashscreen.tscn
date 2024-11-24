@@ -1,9 +1,9 @@
 [gd_scene load_steps=2 format=3 uid="uid://d2vakkgi58gd8"]
 
-[ext_resource type="Script" path="res://SplashScreens/Loading/splashscreen.gd" id="1_qrduy"]
+[ext_resource type="Script" path="res://SplashScreens/Death/splashscreen.gd" id="1_hw8de"]
 
 [node name="Splashscreen" type="CanvasLayer"]
-script = ExtResource("1_qrduy")
+script = ExtResource("1_hw8de")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 offset_right = 1279.0
