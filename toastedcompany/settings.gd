@@ -11,7 +11,7 @@ func _process(delta: float) -> void:
 	if self.visible:
 		if not slider.has_focus():
 			slider.grab_focus()
-		if Input.is_action_just_pressed("a"):
+		if Input.is_action_just_pressed("ui_accept"):
 			self.visible = false
 			get_parent().get_node("Menu/StartBtn").grab_focus()
 			get_parent().get_node("Menu").visible = true

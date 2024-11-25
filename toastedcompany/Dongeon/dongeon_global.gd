@@ -2,7 +2,7 @@ extends Node
 
 var is_paused = false
 var current_level = 0
-var current_lives = 0
+var current_lives = 3
 
 var brightness = 1 #Intensity on player
 var insane_mode = false

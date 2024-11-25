@@ -14,6 +14,31 @@ grow_vertical = 2
 focus_mode = 2
 script = ExtResource("1_hxy72")
 
+[node name="Title" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -254.0
+offset_right = 141.0
+offset_bottom = 128.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label2" type="Label" parent="Title"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 29
+text = "TOASTED COMPANY
+
+
+
+
+
+"
+
 [node name="Menu" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 8
@@ -159,28 +184,28 @@ offset_top = 513.0
 offset_right = 595.0
 offset_bottom = 536.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="HighScore" type="HBoxContainer" parent="."]
 layout_mode = 0
 offset_left = 215.0
-offset_top = 503.0
-offset_right = 1068.0
-offset_bottom = 547.0
+offset_top = 165.0
+offset_right = 1074.0
+offset_bottom = 210.0
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="HighScore"]
 layout_mode = 2
 
-[node name="HS_Normal" type="Label" parent="HBoxContainer/HBoxContainer2"]
+[node name="HS_Normal" type="Label" parent="HighScore/HBoxContainer2"]
 layout_mode = 2
 text = "Highest score (Normal): 1000"
 
-[node name="HBoxContainer" type="Label" parent="HBoxContainer"]
+[node name="HBoxContainer" type="Label" parent="HighScore"]
 layout_mode = 2
 text = "                                                                                                   "
 
-[node name="VBoxContainer" type="HBoxContainer" parent="HBoxContainer"]
+[node name="VBoxContainer" type="HBoxContainer" parent="HighScore"]
 layout_mode = 2
 
-[node name="HS_Insane" type="Label" parent="HBoxContainer/VBoxContainer"]
+[node name="HS_Insane" type="Label" parent="HighScore/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0, 0, 1)
 text = "Highest score (Insane): 9999
