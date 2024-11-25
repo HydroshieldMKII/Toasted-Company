@@ -516,6 +516,11 @@ func _spawn_player() -> void:
 		var player_position = random_room_center * SCALE_FACTOR
 		player.global_position = player_position
 		_update_uhd()
+		
+		# If no more items in the map, spawn new ones
+		var items = get_tree().get_nodes_in_group("item")
+		if items.size() == 0:
+			_spawn_item(true)
 
 func _on_player_collect_item(item_name: String, value: int) -> void:
 	print("Player collected item: ", item_name, " with value: ", value)
