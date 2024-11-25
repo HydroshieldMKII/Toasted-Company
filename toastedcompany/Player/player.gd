@@ -6,10 +6,12 @@ var flash_counter: int
 var flash_value: int = 0
 var timer_timout_executed = true
 
+@onready var hud: CanvasLayer = $HUD
 @onready var light_intensity: PointLight2D = $PointLight2D
 @onready var death_timer: Timer = $DeathTimer
 @onready var spawn_protection_time = $SpawnProtection
 @onready var regen_timer = $HealthRegen
+@onready var paused_screen = preload("res://SplashScreens/Pause/splashscreen.tscn")
 
 var health = 100
 @export var is_dead = false
@@ -24,10 +26,23 @@ func _ready() -> void:
 	sprite = $Sprite
 	shader = sprite.material as ShaderMaterial
 	anim_player.play("idle")
+	
 
 func _physics_process(delta: float) -> void:
+	if DongeonGlobal.is_paused:
+		return
+	elif not hud.visible:
+		hud.visible = true
+
 	move_and_slide()
 	check_health(delta)
+	
+	if Input.is_action_just_pressed("pause"):
+		DongeonGlobal.is_paused = true
+		var pause_instance = paused_screen.instantiate()
+		if not has_node(NodePath(pause_instance.name)):
+			hud.visible = false
+			add_child(pause_instance)
 
 func damage_flash() -> void:
 	while flash_counter < NB_FLASH:
@@ -40,7 +55,7 @@ func damage_flash() -> void:
 	shader.set_shader_parameter("flash_modifier", 0)
 
 func take_damage(damage: int):
-	regen_timer.start() #Restart regen delay
+	regen_timer.start() # Restart regen delay
 	if spawn_protection_time.time_left > 0:
 		return
 	health -= damage

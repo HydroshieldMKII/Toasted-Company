@@ -17,6 +17,9 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	if DongeonGlobal.is_paused:
+		return
+		
 	if is_player_inside_trap and timer_attack_delay.time_left == 0:
 		timer_attack_delay.start()
 		trap_pressed.emit(is_activated)

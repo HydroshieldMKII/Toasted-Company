@@ -1,7 +1,6 @@
 extends Node
-class_name DongeonGlob
 
-var player_can_move = true
+var is_paused = false
 var current_level = 0
 var current_lives = 0
 
