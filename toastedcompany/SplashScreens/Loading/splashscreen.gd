@@ -2,11 +2,15 @@ extends CanvasLayer
 
 const target_scene_path = "res://Dongeon/dongeon.tscn"
 
-var loading_status : int
-var progress : Array[float]
+@onready var title: Label = $HBoxContainer/VBoxContainer/Label
+var loading_status: int
+var progress: Array[float]
 
 func _ready() -> void:
 	# Request to load the target scene:
+	if DongeonGlobal.insane_mode:
+		var red = Color(1.0,0.0,0.0,1.0)
+		title.set("theme_override_colors/font_color",red)
 	ResourceLoader.load_threaded_request(target_scene_path)
 	
 func _process(_delta: float) -> void:

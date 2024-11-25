@@ -542,12 +542,16 @@ func _on_player_collect_item(item_name: String, value: int) -> void:
 		var inventoryWarning = hud.get_node("InventoryWarning")
 		inventoryWarning.visible = true
 
-func _go_next_level() -> void:	
-	map_drawn = false
+func _go_next_level() -> void:
 	DongeonGlobal.current_level += 1
+		
+	# Save high score
+	var menu_scene = preload("res://Menu.tscn")
+	var menu = menu_scene.instantiate()
+	menu.set_scores(get_points_per_level(), DongeonGlobal.current_level, DongeonGlobal.insane_mode)
+	menu.queue_free()
 	
 	get_tree().change_scene_to_file("res://SplashScreens/Loading/splashscreen.tscn")
-	#get_tree().reload_current_scene() # @ _go_next_level(): Removing a CollisionObject node during a physics callback is not allowed and will cause undesired behavior. Remove with call_deferred() instead.
 
 func _on_tunnel_entered(area: Area2D) -> void:
 	if area.is_in_group("player"):

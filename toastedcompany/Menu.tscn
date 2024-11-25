@@ -190,17 +190,19 @@ offset_left = 215.0
 offset_top = 165.0
 offset_right = 1074.0
 offset_bottom = 210.0
+alignment = 1
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="HighScore"]
 layout_mode = 2
 
 [node name="HS_Normal" type="Label" parent="HighScore/HBoxContainer2"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.437799, 0.616361, 1, 1)
 text = "Highest score (Normal): 1000"
 
 [node name="HBoxContainer" type="Label" parent="HighScore"]
 layout_mode = 2
-text = "                                                                                                   "
+text = "|"
 
 [node name="VBoxContainer" type="HBoxContainer" parent="HighScore"]
 layout_mode = 2
