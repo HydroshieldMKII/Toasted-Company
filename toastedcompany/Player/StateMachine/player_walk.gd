@@ -22,7 +22,8 @@ func update(delta: float) -> void:
 	if dir.length() > 0:
 		player.velocity = dir * move_speed
 	else:
-		player.velocity = player.velocity.move_toward(Vector2.ZERO, 20)
+		player.direction = Vector2.ZERO
+		player.velocity = Vector2.ZERO
 	
 	if (player.velocity.length() == 0):
 		#print("Transitionned to idle")
@@ -36,6 +37,8 @@ func physics_update(delta: float) -> void:
 		player.velocity = Vector2.ZERO
 		return
 	if (player.velocity.length() > 0):
+		round(player.velocity.x)
+		round(player.velocity.y)
 		if (player.velocity.x > 0 or player.velocity.x < 0):
 			anim_player.play("walk_side")
 			if (player.velocity.x > 0):
