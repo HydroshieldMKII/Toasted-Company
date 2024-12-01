@@ -20,11 +20,10 @@ func _ready() -> void:
 	update_labels()
 	start_btn.grab_focus()
 	
-	print("Starting api")
-	var api_scene = preload("res://API/api.tscn")
-	var api = api_scene.instantiate()
-	call_deferred("add_child", api)
-	#api._ready()
+	#print("Starting api")
+	#var api_scene = preload("res://API/api.tscn")
+	#var api = api_scene.instantiate()
+	#call_deferred("add_child", api)
 	
 func verify_save_dir(path: String) -> void:
 	DirAccess.make_dir_absolute(path)
