@@ -56,7 +56,7 @@ func get_rooms_max_per_level() -> int:
 	return round(15 + DongeonGlobal.current_level * 2)
 
 func get_corridor_width() -> int:
-	return round(48)
+	return round(32)
 
 func get_spike_quantity() -> int:
 	if DongeonGlobal.insane_mode:

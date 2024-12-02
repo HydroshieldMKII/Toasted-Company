@@ -16,6 +16,7 @@ func _on_resume_pressed() -> void:
 
 func _on_main_menu_pressed() -> void:
 	DongeonGlobal.is_paused = false
+	DongeonGlobal.current_lives = 3
 	get_tree().change_scene_to_file("res://Menu.tscn")
 
 func _on_exit_pressed() -> void:
