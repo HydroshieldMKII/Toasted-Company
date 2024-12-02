@@ -6,7 +6,7 @@ _**Créé par Vincent Bureau**_
 
 ## Description
 
-**Toasted Company** est un jeu inspiré du titre populaire _Lethal Company_. Le but du jeu est de trouver des objets de valeur dans un donjon et de les ramener à la sortie pour amasser des points. Le jeu est structuré par niveaux, chaque niveau devenant de plus en plus difficile jusqu'à l'infini.
+**Toasted Company** reprend des concepts clés de jeux populaires comme _Lethal Company_, mais introduit sa propre approche avec des ennemis uniques et des défis qui augmentent avec le temps. Ce jeu met à l’épreuve les réflexes et la stratégie des joueurs.
 
 ---
 
@@ -37,13 +37,13 @@ Pour rendre le jeu plus difficile, j'ai ajouté des pièges. Les pièges sont de
 
 #### Exemple de piège :
 
-<div align="center">
+<div align="center" style="margin-top: 20px;">
     <img src="images/spikes0.png" alt="Piège inactif" style="max-width: 400px;">
     <br>
     <em>Piège inactif</em>
 </div>
 
-<div align="center">
+<div align="center" style="margin-top: 20px;">
     <img src="images/spikes1.png" alt="Piège actif" style="max-width: 400px;">
     <br>
     <em>Piège actif</em>
@@ -62,30 +62,30 @@ Il existe deux types d'ennemis dans le jeu : **minotaures** et **mages noirs**. 
   - `Attack` : Attaque lorsque le joueur est suffisamment proche.
 
 - **Mage noir** :
-  - `Idle` : Attente passive.
-  - `Attack` : Attaque à distance lorsqu'il détecte le joueur.
+  - `Idle` : Attente passive. Se téléporte de temps en temps.
+  - `Attack` : Se téléporte et lance un projectile sur le joueur.
 
 #### Illustrations des comportements :
 
-<div align="center">
+<div align="center" style="margin-top: 20px;">
     <img src="images/mino0.png" alt="Minotaure en mode Taunt" style="max-width: 400px;">
     <br>
     <em>Minotaure en mode Taunt</em>
 </div>
 
-<div align="center">
+<div align="center" style="margin-top: 20px;">
     <img src="images/mino1.png" alt="Minotaure en mode Attack" style="max-width: 400px;">
     <br>
     <em>Minotaure en mode Attack</em>
 </div>
 
-<div align="center">
+<div align="center" style="margin-top: 20px;">
     <img src="images/mages0.png" alt="Mage noir en mode Idle" style="max-width: 400px;">
     <br>
     <em>Mage noir en mode Idle</em>
 </div>
 
-<div align="center">
+<div align="center" style="margin-top: 20px;">
     <img src="images/mages1.png" alt="Mage noir en mode Attack" style="max-width: 400px;">
     <br>
     <em>Mage noir en mode Attack</em>
@@ -99,13 +99,13 @@ Le joueur peut ramasser des objets et les stocker dans un inventaire. Cependant,
 
 #### Illustrations de l'inventaire :
 
-<div align="center">
+<div align="center" style="margin-top: 20px;">
     <img src="images/inventory.png" alt="Inventaire du joueur" style="max-width: 400px;">
     <br>
     <em>Inventaire du joueur</em>
 </div>
 
-<div align="center">
+<div align="center" style="margin-top: 20px;">
     <img src="images/item.png" alt="Objet à ramasser" style="max-width: 400px;">
     <br>
     <em>Objet à ramasser</em>
