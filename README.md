@@ -21,12 +21,40 @@ _**Créé par Vincent Bureau**_
 
 ### 1. Génération procédurale
 
-Dans ce projet, j'ai utilisé le concept de génération procédurale pour créer les niveaux. Il existe plusieurs façons de générer un niveau de manière aléatoire, mais j'ai choisi une génération de type _room-based_. Cela signifie que je crée des salles de différentes tailles, connectées entre elles pour former un donjon. Une fois le terrain généré, un second algorithme parcourt le donjon et place des murs aux endroits appropriés.
+La génération procédurale des niveaux dans Toasted Company repose sur un algorithme basé sur des salles (room-based generation). Ce processus est divisé en plusieurs étapes dynamiques pour créer des niveaux uniques:
 
-Inspiration partielle de ce projet : [Vidéo YouTube](https://www.youtube.com/watch?v=_BABPmlkqh8)
+#### Création des salles :
+
+Des salles de tailles aléatoires sont générées dans une zone prédéfinie.
+Les dimensions des salles varient entre une taille minimale et maximale configurée, en respectant les contraintes de placement pour éviter les chevauchements.
+
+#### Placement des corridors :
+
+Les salles adjacentes sont connectées par des corridors.
+L’algorithme choisit des trajectoires soit horizontales-verticales, soit verticales-horizontales pour créer des chemins naturels et diversifiés.
+
+#### Remplissage des données de niveau :
+
+Une fois les salles et corridors définis, le terrain est rempli avec des tuiles spécifiques :
+Les salles utilisent des tuiles de sol standard avec des variations esthétiques.
+Les corridors sont dessinés avec des tuiles plus étroites pour simuler des passages.
+
+#### Ajout des murs :
+
+Un algorithme secondaire vérifie chaque case pour ajouter des murs aux bordures des salles et des corridors.
+Ces murs servent également à générer des occluders de lumière et des collisions physiques pour limiter le champ de vision et les mouvements.
+
+#### Gestion de la diversité :
+
+Chaque niveau est agrandi progressivement en fonction du niveau actuel du joueur.
+Les salles, corridors, et pièges augmentent en quantité pour correspondre à la difficulté croissante.
+
+Source: [Vidéo YouTube](https://www.youtube.com/watch?v=_BABPmlkqh8)
 
 <div align="center">
     <img src="images/dongeon.png" alt="Exemple de génération de niveau" style="max-width: 500px;">
+    <br>
+    <em>Exemple de génération de niveau</em>
 </div>
 
 ---
@@ -75,6 +103,7 @@ Il existe deux types d'ennemis dans le jeu : **minotaures** et **mages noirs**. 
 
 <div align="center" style="margin-top: 20px;">
     <img src="images/mino1.png" alt="Minotaure en mode Attack" style="max-width: 400px;">
+        <img src="images/mino2.png" alt="Minotaure en mode Attack" style="max-width: 400px;">
     <br>
     <em>Minotaure en mode Attack</em>
 </div>
