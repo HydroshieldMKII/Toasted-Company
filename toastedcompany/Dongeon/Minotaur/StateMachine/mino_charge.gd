@@ -54,9 +54,10 @@ func handle_collision(collision: KinematicCollision2D):
 		minotaur.speed = 700
 
 	# Increase the chance of big attack
-	var new_chance = minotaur.big_attack_chance * 1.1
-	if new_chance <= 100:
-		minotaur.big_attack_chance = new_chance
+	if DongeonGlobal.insane_mode:
+		var new_chance = minotaur.big_attack_chance * 1.1
+		if new_chance <= 100:
+			minotaur.big_attack_chance = new_chance
 
 	# Make the minotaur bigger
 	var new_charge_area = minotaur.get_node("ChargeArea/CollisionShape2D").shape as CircleShape2D
@@ -93,7 +94,6 @@ func handle_collision(collision: KinematicCollision2D):
 	target = null
 	pre_charge_count = 0
 
-	
 func _on_animation_minotaur_animation_finished(anim_name: StringName) -> void:
 	if anim_name == "pre_charge" and not charging:
 		if pre_charge_count < 3 or (DongeonGlobal.insane_mode and pre_charge_count < 2):

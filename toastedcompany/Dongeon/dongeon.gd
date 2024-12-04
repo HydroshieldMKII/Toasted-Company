@@ -82,7 +82,30 @@ func get_tunnel_quantity() -> int:
 var points_accumulated = 0
 
 func _ready() -> void:
-	dongeon_setup()
+	points_accumulated = 0
+	
+	# Clear old tilemap level
+	tile_map.clear()
+
+	# Generate dongeon shape
+	_generate_dongeon_data()
+	_draw_terrains()
+	_generate_occluders_collisions()
+	
+	# Spawn goodies
+	_spawn_random_items()
+	
+	# Spawn the player
+	_spawn_player()
+	_update_uhd()
+	
+	# Spawn tunnel to deposit items
+	_spawn_random_tunnels()
+	
+	# Spawn danger
+	_spawn_spikes()
+	_spawn_minotaurs()
+	_spawn_mages()
 		
 func _process(delta: float) -> void:
 	_manage_input() # for debug
@@ -102,7 +125,7 @@ func _manage_input() -> void:
 	if Input.is_action_pressed("pause") and Input.is_action_pressed("start"):
 		get_tree().quit()
 		
-	return #Below are debug function, comment me to enable
+	return # Below are debug function, comment me to enable
 
 	if Input.is_action_just_pressed("r"): # reset the game
 		get_tree().reload_current_scene()
@@ -620,29 +643,3 @@ func _player_pressed_trap(is_activated: bool) -> void:
 			player.take_damage(10 + DongeonGlobal.current_level * 10)
 		else:
 			player.take_damage(10)
-		
-func dongeon_setup() -> void:	
-	points_accumulated = 0
-	
-	# Clear old tilemap level
-	tile_map.clear()
-
-	# Generate dongeon shape
-	_generate_dongeon_data()
-	_draw_terrains()
-	_generate_occluders_collisions()
-	
-	# Spawn goodies
-	_spawn_random_items()
-	
-	# Spawn the player
-	_spawn_player()
-	_update_uhd()
-	
-	# Spawn tunnel to deposit items
-	_spawn_random_tunnels()
-	
-	# Spawn danger
-	_spawn_spikes()
-	_spawn_minotaurs()
-	_spawn_mages()
