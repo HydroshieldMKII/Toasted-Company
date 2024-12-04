@@ -125,7 +125,7 @@ func _manage_input() -> void:
 	if Input.is_action_pressed("pause") and Input.is_action_pressed("start"):
 		get_tree().quit()
 		
-	return # Below are debug function, comment me to enable
+	#return # Below are debug function, comment me to enable
 
 	if Input.is_action_just_pressed("r"): # reset the game
 		get_tree().reload_current_scene()
@@ -186,7 +186,7 @@ func _generate_data() -> void:
 			var room_previous: Rect2 = rooms[-2]
 			_add_connection(rng, room_previous, room)
 		rooms.append(room)
-		room_center.append((room.position + room.end) / 2)
+		room_center.append((room.position + room.end) / 2) #Save room center data for futur reference
 	print("Generate data done")
 
 func _get_random_room(rng: RandomNumberGenerator) -> Rect2:
@@ -229,13 +229,6 @@ func _intersects(rooms: Array, room: Rect2) -> bool:
 	return false
 
 func _generate_occluders_collisions() -> void:
-	# Clear any existing occluders and collision bodies
-	for child in get_children():
-		if child is LightOccluder2D:
-			child.queue_free()
-		elif child is StaticBody2D:
-			child.queue_free()
-
 	# Check all tiles and add occluders / collision bodies where needed
 	for x in range(0, get_dongeon_size().x):
 		for y in range(0, get_dongeon_size().y):
@@ -313,7 +306,6 @@ func _draw_terrains() -> void:
 
 	# Tiles for corridors
 	for position in corridor_data.keys():
-		# Floor tile
 		var random_x = randi_range(24, 27)
 		var random_y = randi_range(25, 27)
 		var coords = Vector2i(int(position.x / 16), int(position.y / 16))
@@ -332,15 +324,9 @@ func _draw_terrains() -> void:
 # Spawner
 func _spawn_random_tunnels() -> void:
 	var tunnels_spawned = 0
-	var max_tunnels = get_tunnel_quantity()
 	var rooms_with_tunnels = []
 
-	# Clear any existing tunnels
-	for tunnel in tunnels:
-		tunnel.queue_free()
-		tunnels.erase(tunnel)
-
-	while tunnels_spawned < max_tunnels and rooms_with_tunnels.size() < room_center.size():
+	while tunnels_spawned < get_tunnel_quantity() and rooms_with_tunnels.size() < room_center.size():
 		# Choose a random room that hasn't had a tunnel spawned yet
 		var random_room_index = randi() % room_center.size()
 		if random_room_index in rooms_with_tunnels:
@@ -391,13 +377,7 @@ func _spawn_random_tunnels() -> void:
 		tunnels_spawned += 1
 
 	
-func _spawn_random_items() -> void:
-	# Clear any existing items
-	var items = get_tree().get_nodes_in_group("item")
-	for item in items:
-		item.queue_free()
-		items.erase(item)
-	
+func _spawn_random_items() -> void:	
 	# Spawn items in random rooms
 	var item_sceen = preload("res://Dongeon/Items/item.tscn")
 	var item = item_sceen.instantiate()
@@ -426,11 +406,6 @@ func _spawn_item(in_room: bool) -> void:
 	call_deferred("add_child", item)
 
 func _spawn_spikes() -> void:
-	# Clear any existing spikes
-	var spikes = get_tree().get_nodes_in_group("spike")
-	for spike in spikes:
-		spike.queue_free()
-
 	for i in get_spike_quantity():
 		var spike = spike_scene.instantiate()
 		var random_tile = room_data.keys()[randi() % room_data.size()]
@@ -447,14 +422,6 @@ func _spawn_spikes() -> void:
 		call_deferred("add_child", spike)
 
 func _spawn_minotaurs() -> void:
-	# Clear any existing ennemies
-	for m in minotaurs:
-		m.destroy()
-		m.queue_free()
-		minotaurs.erase(m)
-		
-	minotaurs.clear()
-
 	var minotaur_scene = preload("res://Dongeon/Minotaur/minotaur.tscn")
 	var used_tiles = []
 	for i in get_minotaur_quantity():
@@ -477,12 +444,6 @@ func _spawn_minotaurs() -> void:
 	print("Ennemies spawn done")
 
 func _spawn_mages() -> void:
-	# Clear any existing ennemies
-	for m in mages:
-		m.destroy()
-		m.queue_free()
-		mages.erase(m)
-
 	var mage_scene = preload("res://Dongeon/Mage/mage.tscn")
 	var used_tiles = []
 	for i in get_mage_quantity():
