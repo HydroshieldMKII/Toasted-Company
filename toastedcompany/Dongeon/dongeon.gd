@@ -98,6 +98,11 @@ func _manage_input() -> void:
 
 	if Input.is_action_just_pressed("equal"): # zoom in
 		player.get_node("Camera2D").zoom *= 1.5
+		
+	if Input.is_action_pressed("pause") and Input.is_action_pressed("start"):
+		get_tree().quit()
+		
+	return #Below are debug function, comment me to enable
 
 	if Input.is_action_just_pressed("r"): # reset the game
 		get_tree().reload_current_scene()
@@ -105,8 +110,6 @@ func _manage_input() -> void:
 		
 	if Input.is_action_just_pressed("."):
 		_go_next_level()
-	
-	#return
 	
 	if Input.is_action_just_pressed("f_key"): # toggle fog of war
 		$Fog.visible = not $Fog.visible
@@ -549,12 +552,7 @@ func _on_player_collect_item(item_name: String, value: int) -> void:
 
 func _go_next_level() -> void:
 	DongeonGlobal.current_level += 1
-		
-	# Save high score
-	var menu_scene = preload("res://Menu.tscn")
-	var menu = menu_scene.instantiate()
-	menu.set_scores(get_points_per_level(), DongeonGlobal.current_level, DongeonGlobal.insane_mode)
-	menu.queue_free()
+	saveProgress()
 	
 	get_tree().change_scene_to_file("res://SplashScreens/Loading/splashscreen.tscn")
 
@@ -610,7 +608,11 @@ func _player_death() -> void:
 		
 func saveProgress() -> void:
 	print("Saving progress")
-	pass
+	
+	var menu_scene = preload("res://Menu.tscn")
+	var menu = menu_scene.instantiate()
+	menu.set_scores(get_points_per_level(), DongeonGlobal.current_level, DongeonGlobal.insane_mode)
+	menu.queue_free()
 
 func _player_pressed_trap(is_activated: bool) -> void:
 	if is_activated:
@@ -619,10 +621,7 @@ func _player_pressed_trap(is_activated: bool) -> void:
 		else:
 			player.take_damage(10)
 		
-func dongeon_setup() -> void:
-	if map_drawn: return
-	map_drawn = true
-	
+func dongeon_setup() -> void:	
 	points_accumulated = 0
 	
 	# Clear old tilemap level

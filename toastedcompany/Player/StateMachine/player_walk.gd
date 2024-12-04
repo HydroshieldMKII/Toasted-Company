@@ -7,12 +7,14 @@ var anim_player: AnimationPlayer
 @export var move_speed := 425.0
 
 func manage_input() -> Vector2:
-	var dir: Vector2 = Input.get_vector("left", "right", "up", "down").normalized()
+	var dir: Vector2 = Input.get_vector("left", "right", "up", "down")
 
 	if (dir.x != 0):
 		dir.x = round(dir.x)
+	if (dir.y != 0):
+		dir.y = round(dir.y)
 
-	return dir
+	return dir.normalized()
 
 func update(delta: float) -> void:
 	if player.is_dead:
