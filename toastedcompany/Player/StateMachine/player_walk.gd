@@ -8,6 +8,10 @@ var anim_player: AnimationPlayer
 
 func manage_input() -> Vector2:
 	var dir: Vector2 = Input.get_vector("left", "right", "up", "down").normalized()
+
+	if (dir.x != 0):
+		dir.x = round(dir.x)
+
 	return dir
 
 func update(delta: float) -> void:

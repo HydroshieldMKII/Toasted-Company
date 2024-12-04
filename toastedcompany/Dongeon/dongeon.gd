@@ -640,7 +640,7 @@ func dongeon_setup() -> void:
 	_spawn_player()
 	_update_uhd()
 	
-	# Spawn goodies endpoint
+	# Spawn tunnel to deposit items
 	_spawn_random_tunnels()
 	
 	# Spawn danger
