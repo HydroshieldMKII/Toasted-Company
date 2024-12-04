@@ -81,9 +81,7 @@ func get_tunnel_quantity() -> int:
 	
 var points_accumulated = 0
 
-func _ready() -> void:
-	points_accumulated = 0
-	
+func _ready() -> void:	
 	# Clear old tilemap level
 	tile_map.clear()
 
@@ -150,7 +148,7 @@ func _manage_input() -> void:
 		player.get_node("StateMachine/Walk").move_speed += 100
 		
 	if Input.is_action_just_pressed("g"): # toggle player collision
-		player.get_node("CollisionShape2D").disabled = not player.get_node("CollisionShape2D").disabled
+		player.get_node("CollisionShape2D").disabled = !player.get_node("CollisionShape2D").disabled
 
 func _update_uhd() -> void:
 	var hud = player.get_node("HUD")
@@ -178,6 +176,8 @@ func _generate_data() -> void:
 
 	for r in get_rooms_max_per_level():
 		var room = _get_random_room(rng)
+		
+		#If room overlapse dont add
 		if _intersects(rooms, room):
 			continue
 
@@ -185,6 +185,8 @@ func _generate_data() -> void:
 		if rooms.size() > 1:
 			var room_previous: Rect2 = rooms[-2]
 			_add_connection(rng, room_previous, room)
+			
+		# Ajouter la salle au dungeon et save son data
 		rooms.append(room)
 		room_center.append((room.position + room.end) / 2) #Save room center data for futur reference
 	print("Generate data done")
@@ -203,8 +205,11 @@ func _add_room(room: Rect2) -> void:
 			room_data[Vector2(x, y)] = true
 
 func _add_connection(rng: RandomNumberGenerator, room1: Rect2, room2: Rect2) -> void:
+	#Recuperer le centre des deux salles
 	var room_center1 = (room1.position + room1.end) / 2
 	var room_center2 = (room2.position + room2.end) / 2
+	
+	#Aleatoirement, creer un corridor soit vertical > horizontal ou horizontal > vertical
 	if rng.randi_range(0, 1) == 0:
 		_add_corridor(room_center1.x, room_center2.x, room_center1.y, Vector2.AXIS_X)
 		_add_corridor(room_center1.y, room_center2.y, room_center2.x, Vector2.AXIS_Y)
