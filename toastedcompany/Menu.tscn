@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://cm7kwcphuplnw"]
+[gd_scene load_steps=5 format=3 uid="uid://cm7kwcphuplnw"]
 
 [ext_resource type="Script" path="res://menu.gd" id="1_hxy72"]
 [ext_resource type="Script" path="res://how_to_play.gd" id="2_alcwk"]
 [ext_resource type="Script" path="res://settings.gd" id="2_mvjff"]
+[ext_resource type="AudioStream" uid="uid://db8y5bqien8ih" path="res://Audio/Two Steps From Hell - Invincible - 08 - Black Blade.mp3" id="4_brspe"]
 
 [node name="Menu" type="Control"]
 layout_mode = 3
@@ -130,13 +131,13 @@ offset_bottom = 362.0
 
 [node name="Label" type="Label" parent="HowToPlay/Label/VBoxContainer"]
 layout_mode = 2
-text = "- Objective: Collect items and drop them at a trap
+text = "- Objective: Collect items and drop them at a trap.
 
--Danger: There are a few trap and ennemie to avoid to get to a trap
+- Danger: There are a few dangers and enemies to avoid while getting to a trap.
 
-- Lives: You have 3, after you loose and restart from the beginning
+- Lives: You have 3 lives. If you lose them all, you restart from the beginning.
 
-- Go as far as you can!"
+- Goal: Go as far as you can!"
 
 [node name="Settings" type="VBoxContainer" parent="."]
 visible = false
@@ -214,6 +215,12 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0, 0, 1)
 text = "Highest score (Insane): 9999
 "
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_brspe")
+volume_db = -40.0
+autoplay = true
+parameters/looping = true
 
 [connection signal="pressed" from="Menu/StartBtn" to="." method="_on_start_btn_pressed"]
 [connection signal="pressed" from="Menu/InsaneBtn" to="." method="_on_insane_btn_pressed"]

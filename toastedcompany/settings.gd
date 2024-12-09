@@ -4,7 +4,8 @@ extends VBoxContainer
 @onready var slider: HSlider = $HSlider
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass
+	brightness_value_label.text = "Brightness = " + str(DongeonGlobal.brightness)
+	slider.value = DongeonGlobal.brightness
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

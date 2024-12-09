@@ -11,7 +11,6 @@ var random_direction
 signal mage_attack_done(mage: Mage)
 
 func enter():
-	print("Deathray enter")
 	is_casting = false
 	is_cast_done = false
 	player_got_it = false
@@ -46,6 +45,7 @@ func physics_update(delta: float) -> void:
 	
 	# Check raycast if player got hit by the ray
 	if is_casting and not player_got_it:
+		mage.cast_beam.force_raycast_update()
 		if mage.cast_beam.is_colliding() and mage.cast_beam.get_collider() == mage.player:
 			player_got_it = true
 			if DongeonGlobal.insane_mode:

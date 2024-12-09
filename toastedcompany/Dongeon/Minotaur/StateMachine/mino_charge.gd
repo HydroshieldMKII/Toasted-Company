@@ -96,27 +96,37 @@ func handle_collision(collision: KinematicCollision2D):
 
 func _on_animation_minotaur_animation_finished(anim_name: StringName) -> void:
 	if anim_name == "pre_charge" and not charging:
-		if pre_charge_count < 3 or (DongeonGlobal.insane_mode and pre_charge_count < 2):
-			pre_charge_count += 1
-		else:
-			#Check if player is in sight and can charge without hitting a wall
-			var ray = minotaur.get_node("RayCast2D") as RayCast2D
-			if ray:
-				ray.target_position = player.global_position - minotaur.global_position
-				ray.force_raycast_update()
-				
-			if ray.is_colliding() and ray.get_collider() == player:
-				target = (player.global_position - minotaur.global_position).normalized()
-				charging = true
+		if DongeonGlobal.insane_mode:
+			if pre_charge_count < 2:
+				pre_charge_count += 1
 			else:
-				print("Mino can't charge, player is behind a wall")
-				pre_charge_count = 0
-				if minotaur.get_node("ChargeArea").overlaps_body(player):
-					Transitioned.emit(self, "Charge")
-				elif minotaur.get_node("TauntArea").overlaps_body(player):
-					Transitioned.emit(self, "Taunt")
-				else:
-					Transitioned.emit(self, "Idle")
+				charge()
+		else:
+			if pre_charge_count < 3:
+				pre_charge_count += 1
+			else:
+				charge()
+						
+func charge() -> void:
+	#Check if player is in sight and can charge without hitting a wall
+	var ray = minotaur.get_node("RayCast2D") as RayCast2D
+	if ray:
+		ray.target_position = player.global_position - minotaur.global_position
+		ray.force_raycast_update()
+		
+	if ray.is_colliding() and ray.get_collider() == player:
+		target = (player.global_position - minotaur.global_position).normalized()
+		charging = true
+	else:
+		print("Mino can't charge, player is behind a wall")
+		pre_charge_count = 0
+		if minotaur.get_node("ChargeArea").overlaps_body(player):
+			Transitioned.emit(self, "Charge")
+		elif minotaur.get_node("TauntArea").overlaps_body(player):
+			Transitioned.emit(self, "Taunt")
+		else:
+			Transitioned.emit(self, "Idle")
+	
 
 func _on_taunt_area_area_exited(area: Area2D) -> void:
 	if area.is_in_group("player") and not charging: # Cancel charge early

@@ -1,7 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://lvs5y87hseuc"]
+[gd_scene load_steps=7 format=3 uid="uid://lvs5y87hseuc"]
 
 [ext_resource type="Script" path="res://Dongeon/dongeon.gd" id="1_0frh8"]
 [ext_resource type="Texture2D" uid="uid://cktav1c7lihm0" path="res://Assests/mainlevbuild.png" id="2_gjgnu"]
+[ext_resource type="AudioStream" uid="uid://dir8big6me451" path="res://Audio/Two Steps From Hell - Battlecry - 01 - None Shall Live.mp3" id="3_sq8up"]
+[ext_resource type="AudioStream" uid="uid://bfcipxuuygfd6" path="res://Audio/Two Steps From Hell - Battlecry - 03 - Victory.mp3" id="4_o34yk"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_a8cgw"]
 texture = ExtResource("2_gjgnu")
@@ -1339,3 +1341,13 @@ tile_set = SubResource("TileSet_hhawu")
 [node name="Fog" type="CanvasModulate" parent="."]
 z_index = 15
 color = Color(0, 0, 0, 1)
+
+[node name="InsaneMusicPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_sq8up")
+volume_db = -35.0
+parameters/looping = true
+
+[node name="NormalMusicPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_o34yk")
+volume_db = -35.0
+parameters/looping = true

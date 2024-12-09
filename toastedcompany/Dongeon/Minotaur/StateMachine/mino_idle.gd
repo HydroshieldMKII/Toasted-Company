@@ -21,7 +21,6 @@ func physics_update(delta: float) -> void:
 func _on_taunt_area_area_entered(area: Area2D) -> void:
 	if area.is_in_group("player"):
 		# Register the player in the minotaur
-		print(area.get_parent())
 		minotaur.player = area.get_parent()
 
 		Transitioned.emit(self, "Taunt")

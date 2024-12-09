@@ -1,0 +1,223 @@
+[gd_scene load_steps=4 format=3 uid="uid://cm7kwcphuplnw"]
+
+[ext_resource type="Script" path="res://menu.gd" id="1_hxy72"]
+[ext_resource type="Script" path="res://how_to_play.gd" id="2_alcwk"]
+[ext_resource type="Script" path="res://settings.gd" id="2_mvjff"]
+
+[node name="Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 2
+script = ExtResource("1_hxy72")
+
+[node name="Title" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -254.0
+offset_right = 141.0
+offset_bottom = 128.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label2" type="Label" parent="Title"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 29
+text = "TOASTED COMPANY
+
+
+
+
+
+"
+
+[node name="Menu" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -45.5
+offset_top = -50.5
+offset_right = 45.5
+offset_bottom = 50.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StartBtn" type="Button" parent="Menu"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../ExitBtn")
+focus_neighbor_bottom = NodePath("../InsaneBtn")
+theme_override_colors/font_focus_color = Color(0.261057, 0.476999, 0.987623, 1)
+text = "START NORMAL"
+
+[node name="InsaneBtn" type="Button" parent="Menu"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../StartBtn")
+focus_neighbor_bottom = NodePath("../OptionsBtn")
+theme_override_colors/font_focus_color = Color(0.988235, 0, 0, 1)
+text = "START INSANE"
+
+[node name="OptionsBtn" type="Button" parent="Menu"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../InsaneBtn")
+focus_neighbor_bottom = NodePath("../HowBtn")
+text = "OPTIONS"
+
+[node name="HowBtn" type="Button" parent="Menu"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../OptionsBtn")
+focus_neighbor_bottom = NodePath("../ExitBtn")
+text = "HOW TO PLAY"
+
+[node name="ExitBtn" type="Button" parent="Menu"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../HowBtn")
+focus_neighbor_bottom = NodePath("../StartBtn")
+theme_override_colors/font_focus_color = Color(0.788235, 0.792157, 0, 1)
+text = "EXIT GAME"
+
+[node name="HowToPlay" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -82.0
+offset_right = 82.0
+offset_bottom = 158.0
+grow_horizontal = 2
+alignment = 1
+script = ExtResource("2_alcwk")
+
+[node name="Label" type="Label" parent="HowToPlay"]
+layout_mode = 2
+text = "
+
+
+The rules are simples
+
+
+
+
+
+
+
+
+
+
+
+
+Press \"A\" to continue"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HowToPlay/Label"]
+layout_mode = 2
+offset_left = -155.0
+offset_top = 146.0
+offset_right = 518.0
+offset_bottom = 362.0
+
+[node name="Label" type="Label" parent="HowToPlay/Label/VBoxContainer"]
+layout_mode = 2
+text = "- Objective: Collect items and drop them at a trap.
+
+- Danger: There are a few dangers and enemies to avoid while getting to a trap.
+
+- Lives: You have 3 lives. If you lose them all, you restart from the beginning.
+
+- Goal: Go as far as you can!"
+
+[node name="Settings" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -148.0
+offset_top = -33.0
+offset_right = 163.0
+offset_bottom = 162.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_mvjff")
+
+[node name="Brightness_value" type="Label" parent="Settings"]
+layout_mode = 2
+text = "Brightness = 1"
+
+[node name="HSlider" type="HSlider" parent="Settings"]
+layout_mode = 2
+min_value = 0.5
+max_value = 1.5
+step = 0.05
+value = 1.0
+tick_count = 25
+ticks_on_borders = true
+
+[node name="Spacer" type="Label" parent="Settings"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Settings"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="Settings"]
+layout_mode = 2
+text = "
+Press \"A\" to continue"
+horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 421.0
+offset_top = 513.0
+offset_right = 595.0
+offset_bottom = 536.0
+
+[node name="HighScore" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 215.0
+offset_top = 165.0
+offset_right = 1074.0
+offset_bottom = 210.0
+alignment = 1
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HighScore"]
+layout_mode = 2
+
+[node name="HS_Normal" type="Label" parent="HighScore/HBoxContainer2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.437799, 0.616361, 1, 1)
+text = "Highest score (Normal): 1000"
+
+[node name="HBoxContainer" type="Label" parent="HighScore"]
+layout_mode = 2
+text = "|"
+
+[node name="VBoxContainer" type="HBoxContainer" parent="HighScore"]
+layout_mode = 2
+
+[node name="HS_Insane" type="Label" parent="HighScore/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+text = "Highest score (Insane): 9999
+"
+
+[connection signal="pressed" from="Menu/StartBtn" to="." method="_on_start_btn_pressed"]
+[connection signal="pressed" from="Menu/InsaneBtn" to="." method="_on_insane_btn_pressed"]
+[connection signal="pressed" from="Menu/OptionsBtn" to="." method="_on_options_btn_pressed"]
+[connection signal="pressed" from="Menu/HowBtn" to="." method="_on_how_btn_pressed"]
+[connection signal="pressed" from="Menu/ExitBtn" to="." method="_on_exit_btn_pressed"]
+[connection signal="changed" from="Settings/HSlider" to="Settings" method="_on_h_slider_changed"]
+[connection signal="value_changed" from="Settings/HSlider" to="Settings" method="_on_h_slider_value_changed"]

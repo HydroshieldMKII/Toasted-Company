@@ -31,7 +31,7 @@ var max_death_per_level = 3
 var speed_negation_per_item = 40
 var ligth_negation_per_item = 2 # 2 scale
 
-# Dynamic level configuration functions
+# Dynamic level configuration
 func get_item_quantity_room() -> int:
 	return round(3 + DongeonGlobal.current_level * 2)
 
@@ -86,7 +86,7 @@ func _ready() -> void:
 	tile_map.clear()
 
 	# Generate dongeon shape
-	_generate_dongeon_data()
+	_generate_data()
 	_draw_terrains()
 	_generate_occluders_collisions()
 	
@@ -104,6 +104,11 @@ func _ready() -> void:
 	_spawn_spikes()
 	_spawn_minotaurs()
 	_spawn_mages()
+	
+	if DongeonGlobal.insane_mode:
+		$InsaneMusicPlayer.playing = true
+	else:
+		$NormalMusicPlayer.playing = true
 		
 func _process(delta: float) -> void:
 	_manage_input() # for debug
@@ -122,6 +127,10 @@ func _manage_input() -> void:
 		
 	if Input.is_action_pressed("pause") and Input.is_action_pressed("start"):
 		get_tree().quit()
+		
+	if Input.is_action_just_pressed("m"):
+		$InsaneMusicPlayer.stream_paused = !$InsaneMusicPlayer.stream_paused
+		$NormalMusicPlayer.stream_paused = !$NormalMusicPlayer.stream_paused
 		
 	#return # Below are debug function, comment me to enable
 
@@ -162,14 +171,6 @@ func _update_uhd() -> void:
 	inventoryWarning.visible = false
 
 # Generation
-
-func _generate_dongeon_data() -> void:
-	room_data.clear()
-	corridor_data.clear()
-	rooms.clear()
-	room_center.clear()
-	_generate_data()
-
 func _generate_data() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
