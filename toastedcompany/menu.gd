@@ -24,6 +24,10 @@ func _ready() -> void:
 	#var api_scene = preload("res://API/api.tscn")
 	#var api = api_scene.instantiate()
 	#call_deferred("add_child", api)
+func _process(delta: float) -> void:
+	if Input.is_action_just_pressed("m"):
+		$AudioStreamPlayer.stream_paused = !$AudioStreamPlayer.stream_paused
+
 	
 func verify_save_dir(path: String) -> void:
 	DirAccess.make_dir_absolute(path)

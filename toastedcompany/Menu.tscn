@@ -34,11 +34,6 @@ layout_mode = 2
 theme_override_colors/font_shadow_color = Color(1, 0, 0, 1)
 theme_override_font_sizes/font_size = 29
 text = "TOASTED COMPANY
-
-
-
-
-
 "
 
 [node name="Menu" type="VBoxContainer" parent="."]
@@ -221,6 +216,23 @@ stream = ExtResource("4_brspe")
 volume_db = -40.0
 autoplay = true
 parameters/looping = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -122.0
+offset_top = -101.0
+offset_right = 122.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Label" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+text = "Made by Vincent Bureau @2024"
 
 [connection signal="pressed" from="Menu/StartBtn" to="." method="_on_start_btn_pressed"]
 [connection signal="pressed" from="Menu/InsaneBtn" to="." method="_on_insane_btn_pressed"]
